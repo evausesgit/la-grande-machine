@@ -8,8 +8,8 @@ services:
       DATABASE_URL: postgresql+psycopg2://machine:${DB_PASSWORD}@db:5432/machine
       RUN_SCHEDULER: "1"
       ADMIN_TOKEN: ${ADMIN_TOKEN}
-    ports:
-      - "8000:8000"
+    expose:
+      - "8000"
     depends_on:
       db:
         condition: service_healthy
