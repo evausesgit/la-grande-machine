@@ -1,0 +1,55 @@
+/* La Grande Machine — charte v1 (papier chaud, accent laiton, deux thèmes) */
+:root {
+  --paper: #f9f9f7; --surface: #fcfcfb; --ink: #0b0b0b; --ink-2: #52514e;
+  --ink-3: #898781; --hairline: rgba(11,11,11,0.10);
+  --brass: #8a6d1f; --brass-soft: rgba(138,109,31,0.12);
+  --up: #006300; --down: #d03b3b;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #0d0d0d; --surface: #1a1a19; --ink: #ffffff; --ink-2: #c3c2b7;
+    --ink-3: #898781; --hairline: rgba(255,255,255,0.10);
+    --brass: #d4b356; --brass-soft: rgba(212,179,86,0.14);
+    --up: #0ca30c; --down: #e66767;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--paper); color: var(--ink);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif; line-height: 1.55;
+}
+.wrap { max-width: 1080px; margin: 0 auto; padding: 0 20px 80px; }
+a { color: var(--brass); }
+
+header { padding: 48px 0 8px; }
+.site { letter-spacing: 0.14em; text-transform: uppercase; font-size: 0.72rem; font-weight: 600; color: var(--ink-3); }
+h1 { font-family: Charter, "Bitstream Charter", Cambria, Georgia, serif;
+     font-size: clamp(1.9rem, 4.5vw, 2.8rem); margin: 0.4rem 0 0.6rem; text-wrap: balance; }
+h1 .amp { color: var(--brass); }
+.lede { color: var(--ink-2); max-width: 62ch; }
+
+.eyebrow { letter-spacing: 0.14em; text-transform: uppercase; font-size: 0.72rem;
+           font-weight: 600; color: var(--brass); margin: 2.6rem 0 0.3rem; }
+.hint { color: var(--ink-3); font-size: 0.85rem; margin: 0 0 12px; max-width: 70ch; }
+
+.brief { background: var(--surface); border: 1px solid var(--hairline);
+         border-radius: 12px; padding: 8px 22px 18px; margin-top: 1.6rem; }
+.brief .eyebrow { margin-top: 1rem; }
+.brief h2 { font-family: Charter, Cambria, Georgia, serif; margin: 0.3rem 0 0.6rem; }
+.brief-body { max-width: 70ch; white-space: pre-wrap; }
+.brief-vide p { color: var(--ink-2); }
+
+.tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; }
+.tile { background: var(--surface); border: 1px solid var(--hairline);
+        border-radius: 10px; padding: 12px 14px; }
+.tile.notable { border-color: var(--brass); background: var(--brass-soft); }
+.tile .lab { font-size: 0.78rem; color: var(--ink-2); min-height: 2.3em; }
+.tile .val { font-size: 1.35rem; font-weight: 650; margin: 1px 0; }
+.tile .unit { font-size: 0.75rem; font-weight: 400; color: var(--ink-3); }
+.tile .delta { font-size: 0.9rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.tile .delta.up { color: var(--up); }
+.tile .delta.down { color: var(--down); }
+.tile .sub { font-size: 0.72rem; color: var(--ink-3); margin-top: 3px; }
+
+footer { margin-top: 4rem; border-top: 1px solid var(--hairline); padding-top: 1.2rem;
+         font-size: 0.9rem; }

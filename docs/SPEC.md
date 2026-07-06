@@ -20,13 +20,13 @@ lisible par un enfant curieux. L'historique s'accumule pour voir les évolutions
 
 | Famille | Séries | Source |
 |---|---|---|
-| Indices actions | S&P 500, Nasdaq, Euro Stoxx 50, CAC 40, DAX, FTSE 100, Nikkei 225, Shanghai, MSCI Émergents (proxy EEM) | stooq / Yahoo |
-| Actions phares | Apple, Nvidia, Microsoft, LVMH, TotalEnergies, ASML, Toyota | stooq / Yahoo |
-| Taux souverains 10 ans | États-Unis, Allemagne, France, Italie, Japon + US 2 ans | FRED + stooq |
+| Indices actions | S&P 500, Nasdaq, Euro Stoxx 50, CAC 40, DAX, FTSE 100, Nikkei 225, Shanghai, MSCI Émergents (proxy EEM) | Yahoo |
+| Actions phares | Apple, Nvidia, Microsoft, LVMH, TotalEnergies, ASML, Toyota | Yahoo |
+| Taux souverains 10 ans | États-Unis, Allemagne, France, Italie, Japon + US 2 ans | FRED (États-Unis) |
 | Spreads dérivés | OAT−Bund, US 10a−2a (pente), spreads crédit IG & High Yield | FRED (BAML) |
-| Devises | EUR/USD, USD/JPY, GBP/USD, USD/CNY, indice dollar DXY | stooq / Yahoo |
-| Matières premières | Brent, WTI, gaz naturel (Henry Hub + TTF si dispo), or, argent, cuivre, blé, maïs | stooq / Yahoo |
-| Crypto | Bitcoin, Ethereum | CoinGecko API |
+| Devises | EUR/USD, USD/JPY, GBP/USD, USD/CNY, indice dollar DXY | Yahoo |
+| Matières premières | Brent, WTI, gaz naturel (Henry Hub + TTF si dispo), or, argent, cuivre, blé, maïs | Yahoo |
+| Crypto | Bitcoin, Ethereum | Yahoo (CoinGecko en secours) |
 | Peur & volatilité | VIX (actions), MOVE si accessible (obligations) | stooq / FRED |
 
 ### Hebdomadaire / différé (les acteurs — le « qui »)
@@ -112,8 +112,12 @@ la-grande-machine/
 
 ## 7. Honnêteté des données (affichée dans l'app)
 
-- Yahoo Finance n'a pas d'API publique officielle : usage toléré mais fragile —
-  **stooq en source principale**, Yahoo en secours ; ce risque est documenté.
+- **Constat du 6 juillet 2026** : stooq est passé derrière un défi anti-robot JavaScript,
+  inutilisable côté serveur. **Yahoo Finance (API chart, non officielle) devient la source
+  principale** — stable avec un User-Agent de navigateur, mais sans garantie contractuelle :
+  le risque est assumé et surveillé via `/api/sante`.
+- Taux souverains hors États-Unis (Bund, OAT, BTP, JGB quotidiens) : pas encore de source
+  gratuite fiable identifiée — à résoudre en phase 3 (piste : API BCE).
 - Le « qui achète/vend » public est **différé** (COT : 3 jours ; 13F : 45 jours) —
   l'app affiche toujours la date de fraîcheur de chaque donnée.
 - Après 2 semaines d'exploitation : **rapport des limites** du gratuit et de ce

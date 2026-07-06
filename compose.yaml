@@ -1,0 +1,32 @@
+# Déployé par Coolify — définir dans l'interface :
+#   DB_PASSWORD  (mot de passe PostgreSQL)
+#   ADMIN_TOKEN  (jeton des routes POST /api/collecte et /api/brief)
+services:
+  app:
+    build: .
+    environment:
+      DATABASE_URL: postgresql+psycopg2://machine:${DB_PASSWORD}@db:5432/machine
+      RUN_SCHEDULER: "1"
+      ADMIN_TOKEN: ${ADMIN_TOKEN}
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: machine
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: machine
+    volumes:
+      - machine-db:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U machine"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  machine-db:
