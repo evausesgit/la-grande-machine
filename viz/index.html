@@ -1,0 +1,1269 @@
+<title>La Grande Machine Financière</title>
+<style>
+  /* ===================== TOKENS ===================== */
+  :root {
+    --paper:        #f9f9f7;
+    --surface:      #fcfcfb;
+    --ink:          #0b0b0b;
+    --ink-2:        #52514e;
+    --ink-3:        #898781;
+    --grid:         #e1e0d9;
+    --baseline:     #c3c2b7;
+    --hairline:     rgba(11,11,11,0.10);
+    --brass:        #8a6d1f;
+    --brass-soft:   rgba(138,109,31,0.12);
+    /* categorical slots (validated light set) */
+    --c-actions:    #2a78d6;  /* slot 1 blue   */
+    --c-oblig:      #1baf7a;  /* slot 2 aqua   */
+    --c-or:         #eda100;  /* slot 3 yellow */
+    --c-immo:       #008300;  /* slot 4 green  */
+    --c-mone:       #4a3aa7;  /* slot 5 violet */
+    --c-credit:     #eb6834;  /* slot 8 orange */
+    --c-crypto:     #e87ba4;  /* slot 7 magenta*/
+    --c-serie3:     #eda100;
+    --c-serie4:     #008300;
+    --c-serie5:     #4a3aa7;
+    --tooltip-bg:   #232320;
+    --tooltip-ink:  #ffffff;
+    --flow-neutral: rgba(82,81,78,0.35);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper:        #0d0d0d;
+      --surface:      #1a1a19;
+      --ink:          #ffffff;
+      --ink-2:        #c3c2b7;
+      --ink-3:        #898781;
+      --grid:         #2c2c2a;
+      --baseline:     #383835;
+      --hairline:     rgba(255,255,255,0.10);
+      --brass:        #d4b356;
+      --brass-soft:   rgba(212,179,86,0.14);
+      --c-actions:    #3987e5;
+      --c-oblig:      #199e70;
+      --c-or:         #c98500;
+      --c-immo:       #008300;
+      --c-mone:       #9085e9;
+      --c-credit:     #d95926;
+      --c-crypto:     #d55181;
+      --c-serie3:     #c98500;
+      --c-serie4:     #008300;
+      --c-serie5:     #9085e9;
+      --tooltip-bg:   #f2f1ec;
+      --tooltip-ink:  #171716;
+      --flow-neutral: rgba(195,194,183,0.30);
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper:        #0d0d0d;
+    --surface:      #1a1a19;
+    --ink:          #ffffff;
+    --ink-2:        #c3c2b7;
+    --ink-3:        #898781;
+    --grid:         #2c2c2a;
+    --baseline:     #383835;
+    --hairline:     rgba(255,255,255,0.10);
+    --brass:        #d4b356;
+    --brass-soft:   rgba(212,179,86,0.14);
+    --c-actions:    #3987e5;
+    --c-oblig:      #199e70;
+    --c-or:         #c98500;
+    --c-immo:       #008300;
+    --c-mone:       #9085e9;
+    --c-credit:     #d95926;
+    --c-crypto:     #d55181;
+    --c-serie3:     #c98500;
+    --c-serie4:     #008300;
+    --c-serie5:     #9085e9;
+    --tooltip-bg:   #f2f1ec;
+    --tooltip-ink:  #171716;
+    --flow-neutral: rgba(195,194,183,0.30);
+  }
+  :root[data-theme="light"] {
+    --paper:        #f9f9f7;
+    --surface:      #fcfcfb;
+    --ink:          #0b0b0b;
+    --ink-2:        #52514e;
+    --ink-3:        #898781;
+    --grid:         #e1e0d9;
+    --baseline:     #c3c2b7;
+    --hairline:     rgba(11,11,11,0.10);
+    --brass:        #8a6d1f;
+    --brass-soft:   rgba(138,109,31,0.12);
+    --c-actions:    #2a78d6;
+    --c-oblig:      #1baf7a;
+    --c-or:         #eda100;
+    --c-immo:       #008300;
+    --c-mone:       #4a3aa7;
+    --c-credit:     #eb6834;
+    --c-crypto:     #e87ba4;
+    --c-serie3:     #eda100;
+    --c-serie4:     #008300;
+    --c-serie5:     #4a3aa7;
+    --tooltip-bg:   #232320;
+    --tooltip-ink:  #ffffff;
+    --flow-neutral: rgba(82,81,78,0.35);
+  }
+
+  /* ===================== BASE ===================== */
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: Charter, "Bitstream Charter", "Sitka Text", Cambria, Georgia, serif;
+    line-height: 1.62;
+    margin: 0;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 20px 96px; }
+  .prose { max-width: 66ch; }
+  h1, h2, h3 { text-wrap: balance; font-weight: 700; }
+  h2 { font-size: 1.7rem; margin: 0.4rem 0 0.8rem; }
+  h3 { font-size: 1.15rem; margin: 1.6rem 0 0.5rem; }
+  p  { margin: 0.75rem 0; }
+  a  { color: var(--brass); }
+  .sans, .tile, .tooltip, .filters, table, .legend, .axis, figcaption, .kid, .eyebrow, button, .netpanel {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  .eyebrow {
+    letter-spacing: 0.14em; text-transform: uppercase; font-size: 0.72rem;
+    font-weight: 600; color: var(--brass); margin: 4rem 0 0.25rem;
+  }
+  .chapter { border-top: 1px solid var(--hairline); margin-top: 4rem; }
+  .chapter:first-of-type { border-top: none; margin-top: 0; }
+
+  /* ===================== HERO ===================== */
+  header { padding: 72px 0 24px; }
+  header .site { letter-spacing: 0.14em; text-transform: uppercase; font-size: 0.72rem; font-weight: 600; color: var(--ink-3); font-family: system-ui, sans-serif; }
+  h1 { font-size: clamp(2.2rem, 5.5vw, 3.6rem); line-height: 1.08; margin: 0.5rem 0 1rem; }
+  h1 .amp { color: var(--brass); }
+  .lede { font-size: 1.18rem; color: var(--ink-2); max-width: 58ch; }
+  .hero-fig { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; font-weight: 650; font-size: clamp(2.6rem, 7vw, 4.4rem); line-height: 1; margin: 2.2rem 0 0.2rem; }
+  .hero-cap { color: var(--ink-2); font-size: 0.95rem; max-width: 60ch; }
+
+  /* ===================== TILES ===================== */
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; margin: 2rem 0 0; }
+  .tile { background: var(--surface); border: 1px solid var(--hairline); border-radius: 10px; padding: 16px 18px; }
+  .tile .lab { font-size: 0.8rem; color: var(--ink-2); }
+  .tile .val { font-size: 1.7rem; font-weight: 650; margin: 2px 0; }
+  .tile .sub { font-size: 0.78rem; color: var(--ink-3); }
+
+  /* ===================== FIGURE FRAME ===================== */
+  figure.viz { margin: 1.8rem 0; background: var(--surface); border: 1px solid var(--hairline); border-radius: 12px; padding: 20px 20px 14px; }
+  figure.viz > .viz-title { font-family: system-ui, sans-serif; font-weight: 650; font-size: 1rem; margin: 0 0 2px; }
+  figure.viz > .viz-sub { font-family: system-ui, sans-serif; font-size: 0.82rem; color: var(--ink-2); margin: 0 0 14px; }
+  figcaption { font-size: 0.78rem; color: var(--ink-3); margin-top: 10px; }
+  .scrollbox { overflow-x: auto; }
+  svg text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+
+  /* legend */
+  .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 0.8rem; color: var(--ink-2); margin: 10px 0 0; }
+  .legend .key { display: inline-flex; align-items: center; gap: 6px; }
+  .legend .sw  { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+  .legend .ln  { width: 16px; height: 3px; border-radius: 2px; display: inline-block; }
+
+  /* table views */
+  details.tblview { margin-top: 10px; font-family: system-ui, sans-serif; }
+  details.tblview summary { cursor: pointer; font-size: 0.82rem; color: var(--brass); font-weight: 600; }
+  details.tblview table { border-collapse: collapse; margin-top: 8px; font-size: 0.84rem; min-width: 340px; }
+  details.tblview th, details.tblview td { text-align: left; padding: 5px 14px 5px 0; border-bottom: 1px solid var(--grid); }
+  details.tblview td.num, details.tblview th.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+  /* tooltip */
+  .tooltip {
+    position: fixed; z-index: 50; pointer-events: none;
+    background: var(--tooltip-bg); color: var(--tooltip-ink);
+    border-radius: 8px; padding: 8px 11px; font-size: 0.8rem; line-height: 1.45;
+    max-width: 280px; box-shadow: 0 4px 18px rgba(0,0,0,0.25);
+    opacity: 0; transition: opacity 0.08s linear;
+  }
+  .tooltip.on { opacity: 1; }
+  .tooltip .tt-val { font-weight: 700; font-size: 0.92rem; }
+  .tooltip .tt-lab { opacity: 0.75; }
+  .tooltip .tt-key { display: inline-block; width: 12px; height: 3px; border-radius: 2px; margin-right: 6px; vertical-align: middle; }
+
+  /* filters */
+  .filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 14px; }
+  .filters button {
+    background: var(--surface); color: var(--ink-2);
+    border: 1px solid var(--hairline); border-radius: 999px;
+    font-size: 0.82rem; font-weight: 600; padding: 6px 14px; cursor: pointer;
+  }
+  .filters button:hover { border-color: var(--brass); }
+  .filters button[aria-pressed="true"] { background: var(--brass-soft); color: var(--brass); border-color: var(--brass); }
+  .filters button:focus-visible, .scen button:focus-visible, .netnode:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+
+  /* kid boxes */
+  .kid {
+    background: var(--brass-soft); border-radius: 10px; padding: 14px 18px;
+    font-size: 0.92rem; margin: 1.4rem 0; max-width: 66ch;
+  }
+  .kid b { color: var(--brass); }
+
+  /* network */
+  .netgrid { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 16px; align-items: start; }
+  @media (max-width: 820px) { .netgrid { grid-template-columns: 1fr; } }
+  .netpanel {
+    background: var(--surface); border: 1px solid var(--hairline); border-radius: 12px;
+    padding: 16px 18px; font-size: 0.86rem; min-height: 200px;
+  }
+  .netpanel h4 { margin: 0 0 6px; font-size: 0.95rem; }
+  .netpanel .mech { color: var(--ink-2); }
+  .netpanel ul { padding-left: 18px; margin: 8px 0; }
+  .netpanel li { margin: 5px 0; }
+  .scen { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 14px; }
+  .scen button {
+    background: var(--surface); border: 1px solid var(--hairline); border-radius: 10px;
+    color: var(--ink); font-size: 0.84rem; font-weight: 600; padding: 8px 14px; cursor: pointer;
+  }
+  .scen button:hover { border-color: var(--brass); }
+  .scen button[aria-pressed="true"] { background: var(--brass-soft); border-color: var(--brass); color: var(--brass); }
+  .netnode { cursor: pointer; }
+  .netnode circle { transition: opacity 0.2s; }
+  .netedge { transition: opacity 0.2s, stroke-width 0.2s; }
+
+  /* lexique */
+  .lex { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin-top: 1rem; }
+  .lex .card { background: var(--surface); border: 1px solid var(--hairline); border-radius: 10px; padding: 14px 16px; font-size: 0.9rem; }
+  .lex .card b { display: block; font-family: system-ui, sans-serif; margin-bottom: 4px; }
+
+  /* sources */
+  .sources { font-size: 0.85rem; color: var(--ink-2); }
+  .sources li { margin: 6px 0; }
+</style>
+
+<div class="wrap">
+
+<header>
+  <div class="site">Un voyage pour comprendre — à lire en famille</div>
+  <h1>La Grande Machine <span class="amp">Financière</span></h1>
+  <p class="lede">D'où vient l'argent du monde, qui le fait circuler, où il s'investit, et pourquoi
+  quand une chose bouge — le pétrole, les taux, le dollar — tout le reste bouge aussi.</p>
+
+  <div class="hero-fig">471 000 <span style="font-size:0.5em; color:var(--ink-2);">milliards $</span></div>
+  <p class="hero-cap">C'est le patrimoine des ménages du monde entier (UBS, fin 2024). Tout part de là :
+  chaque compte en banque, chaque assurance-vie, chaque cotisation retraite est une goutte de ce fleuve.
+  Cette page suit le trajet de cet argent à travers la machine.</p>
+
+  <div class="tiles sans">
+    <div class="tile"><div class="lab">Échangé sur les devises</div><div class="val">9 600 Md$</div><div class="sub">par JOUR (BIS, avril 2025)</div></div>
+    <div class="tile"><div class="lab">BlackRock, n°1 mondial de la gestion</div><div class="val">14 000 Md$</div><div class="sub">gérés — 4 × le PIB de la France</div></div>
+    <div class="tile"><div class="lab">Poids du dollar</div><div class="val">89 %</div><div class="sub">des échanges de devises impliquent l'USD</div></div>
+    <div class="tile"><div class="lab">Concentration</div><div class="val">47 %</div><div class="sub">des actifs des 500 plus gros gérants sont aux mains des 20 premiers</div></div>
+  </div>
+
+  <div class="kid">💡 <b>Repère pour les enfants :</b> dans cette page, tout est en <b>milliards de dollars (Md$)</b>.
+  1 000 Md$ = mille milliards = ce que les Américains appellent un « trillion ».
+  Le PIB de la France, c'est environ 3 200 Md$ : garde ce chiffre en tête comme mètre-étalon.</div>
+</header>
+
+<!-- ============ CHAPITRE 1 ============ -->
+<section class="chapter" id="ch1">
+  <div class="eyebrow">Chapitre 1</div>
+  <h2>Les réservoirs — où dort l'argent du monde</h2>
+  <div class="prose">
+    <p>Avant de circuler, l'argent est <em>stocké</em> quelque part. Les financiers appellent ça des
+    « classes d'actifs » : des grandes familles de choses qu'on peut posséder. Voici la taille de
+    chaque réservoir.</p>
+  </div>
+  <figure class="viz">
+    <div class="viz-title">Les grands réservoirs de valeur</div>
+    <div class="viz-sub">Valeur totale détenue dans le monde, en milliards de dollars (ordres de grandeur 2024–2025)</div>
+    <div class="scrollbox" id="viz-reservoirs"></div>
+    <details class="tblview"><summary>Voir les données</summary><div id="tbl-reservoirs"></div></details>
+    <figcaption>Sources : Savills (immobilier, estimation), SIFMA 2025 (obligations, actions), FMI/BCE (dépôts, estimation), World Gold Council, Preqin (marchés privés), CoinGecko (crypto).</figcaption>
+  </figure>
+  <div class="prose">
+    <p>Surprise : le plus gros réservoir n'est ni la Bourse ni la dette, c'est <strong>l'immobilier</strong> —
+    surtout les logements des gens, détenus en direct, hors des marchés. Ensuite viennent les
+    <strong>obligations</strong> (la dette des États et des entreprises, découpée en titres qui s'échangent)
+    puis les <strong>actions</strong> (des petits morceaux de propriété des entreprises).</p>
+  </div>
+
+  <h3>Réservoirs et débits : ne pas confondre</h3>
+  <div class="prose">
+    <p>Un réservoir se mesure en « ce qui est possédé » ; un débit, en « ce qui circule chaque jour ».
+    Le marché des changes ne <em>stocke</em> presque rien — mais il fait transiter en trois semaines
+    l'équivalent de toutes les actions du monde.</p>
+  </div>
+  <figure class="viz">
+    <div class="viz-title">Ce qui circule chaque jour</div>
+    <div class="viz-sub">Volume d'échange quotidien, en milliards de dollars par jour</div>
+    <div class="scrollbox" id="viz-debits"></div>
+    <details class="tblview"><summary>Voir les données</summary><div id="tbl-debits"></div></details>
+    <figcaption>Sources : BIS Triennial Survey (avril 2025), World Gold Council (2025), SIFMA (2025). Le débit des devises inclut le marché au comptant, les swaps et les contrats à terme.</figcaption>
+  </figure>
+  <div class="kid">💡 <b>Image pour les enfants :</b> les réservoirs sont des <b>lacs</b> ; les marchés sont des
+  <b>rivières</b> qui les relient. Le lac « immobilier » est immense mais sa rivière est un filet d'eau
+  (vendre une maison prend des mois). Le lac « devises » est petit, mais sa rivière est un torrent :
+  9 600 Md$ par jour.</div>
+</section>
+
+<!-- ============ CHAPITRE 2 ============ -->
+<section class="chapter" id="ch2">
+  <div class="eyebrow">Chapitre 2</div>
+  <h2>Le circuit — qui confie quoi à qui</h2>
+  <div class="prose">
+    <p>L'argent des familles ne va presque jamais directement à la Bourse. Il passe par des
+    <strong>intermédiaires</strong> : la banque (ton compte courant), la caisse de retraite (les cotisations),
+    l'assureur (l'assurance-vie), les fonds d'investissement. Chacun le replace ensuite dans les réservoirs
+    du chapitre 1. Suis les rubans :</p>
+  </div>
+  <figure class="viz">
+    <div class="viz-title">Le voyage de l'épargne mondiale</div>
+    <div class="viz-sub">Épargnants → intermédiaires → réservoirs. Largeur = montants en Md$ (schéma simplifié, ordres de grandeur)</div>
+    <div class="scrollbox" id="viz-sankey"></div>
+    <div class="legend" id="leg-sankey"></div>
+    <details class="tblview"><summary>Voir les données</summary><div id="tbl-sankey"></div></details>
+    <figcaption>Schéma pédagogique : les périmètres se recoupent dans la réalité (une caisse de retraite peut confier un mandat à un gérant d'actifs, qui achète des obligations…). Survole un ruban pour lire le flux.</figcaption>
+  </figure>
+  <div class="kid">💡 <b>Les poupées russes :</b> ta caisse de retraite ne choisit pas toujours elle-même les
+  actions. Elle donne souvent un <b>mandat</b> à un gérant comme BlackRock, Amundi ou Vanguard : « place
+  ces 10 milliards pour nous ». C'est pour ça que les gérants d'actifs sont devenus si énormes —
+  ils gèrent l'argent <b>des autres</b>, jamais le leur.</div>
+</section>
+
+<!-- ============ CHAPITRE 3 ============ -->
+<section class="chapter" id="ch3">
+  <div class="eyebrow">Chapitre 3</div>
+  <h2>Les géants — qui tient les manettes</h2>
+  <div class="prose">
+    <p>Six familles d'acteurs se partagent la machine. Choisis une famille pour voir ses champions —
+    et note que chaque famille joue un rôle différent : la banque <em>prête</em>, l'assureur <em>promet</em>,
+    le fonds de pension <em>prépare les retraites</em>, le gérant d'actifs <em>place pour les autres</em>,
+    le fonds souverain <em>investit pour un État</em>, le hedge fund <em>parie</em>.</p>
+  </div>
+  <div class="filters" id="fam-filters" role="group" aria-label="Choisir une famille d'acteurs"></div>
+  <figure class="viz">
+    <div class="viz-title" id="giants-title">Les plus grands gérants d'actifs</div>
+    <div class="viz-sub" id="giants-sub"></div>
+    <div class="scrollbox" id="viz-giants"></div>
+    <details class="tblview"><summary>Voir les données</summary><div id="tbl-giants"></div></details>
+    <figcaption id="giants-cap"></figcaption>
+  </figure>
+</section>
+
+<!-- ============ CHAPITRE 4 ============ -->
+<section class="chapter" id="ch4">
+  <div class="eyebrow">Chapitre 4</div>
+  <h2>La croissance — 25 ans d'expansion</h2>
+  <div class="prose">
+    <p>La machine grossit plus vite que l'économie réelle. Trois moteurs : les marchés montent
+    (l'argent placé « travaille »), l'épargne mondiale s'accumule (retraites, émergents), et la gestion
+    se concentre chez quelques géants. Regarde BlackRock : ×30 en vingt ans.</p>
+  </div>
+  <figure class="viz">
+    <div class="viz-title">L'ascension des géants</div>
+    <div class="viz-sub">Actifs gérés ou détenus, en milliards de dollars (Md$) — trajectoires approximatives reconstituées par étapes de 5 ans</div>
+    <div class="scrollbox" id="viz-growth"></div>
+    <div class="legend" id="leg-growth"></div>
+    <details class="tblview"><summary>Voir les données</summary><div id="tbl-growth"></div></details>
+    <figcaption>Sources : rapports annuels, Thinking Ahead Institute, Global SWF, With Intelligence. Le fonds souverain de Norvège, parti de presque rien en 1998, dépasse aujourd'hui 2 000 Md$ : c'est le pétrole de la mer du Nord transformé en épargne pour les générations futures.</figcaption>
+  </figure>
+</section>
+
+<!-- ============ CHAPITRE 5 ============ -->
+<section class="chapter" id="ch5">
+  <div class="eyebrow">Chapitre 5</div>
+  <h2>Les dépendances — quand une chose bouge, tout bouge</h2>
+  <div class="prose">
+    <p>Voici le cœur de la machine : la carte des influences. Chaque flèche est une chaîne de
+    transmission réelle. <strong>Clique sur un nœud</strong> pour lire ses connexions, ou
+    <strong>lance un scénario</strong> pour voir une onde de choc se propager, étape par étape.</p>
+  </div>
+  <div class="scen" id="scenarios" role="group" aria-label="Scénarios"></div>
+  <div class="netgrid">
+    <figure class="viz" style="margin:0;">
+      <div class="viz-title">La carte des transmissions</div>
+      <div class="viz-sub">Flèche pleine = « pousse dans le même sens » (+) · flèche creuse = « pousse en sens inverse » (−)</div>
+      <div class="scrollbox" id="viz-network"></div>
+    </figure>
+    <div class="netpanel" id="netpanel" aria-live="polite">
+      <h4>Explore la carte</h4>
+      <p class="mech">Clique sur un nœud (par ex. « Dollar US ») pour voir qui l'influence et qui il influence.
+      Ou lance un scénario ci-dessus : la machine s'animera pas à pas.</p>
+    </div>
+  </div>
+  <details class="tblview" style="margin-top:14px;"><summary>Voir toutes les transmissions (table)</summary><div id="tbl-network"></div></details>
+
+  <h3>Trois boucles à retenir</h3>
+  <div class="prose">
+    <p><strong>La boucle de l'inflation.</strong> Pétrole ↑ → tout coûte plus cher → la banque centrale monte
+    ses taux pour calmer le jeu → le crédit se raréfie → l'économie ralentit → le pétrole redescend.
+    La machine se régule… avec du retard et de la casse.</p>
+    <p><strong>La boucle du dollar.</strong> Taux américains ↑ → le monde achète du dollar → le dollar monte →
+    les pays endettés en dollars étouffent → panique → tout le monde se réfugie… dans le dollar.
+    Le privilège américain : la monnaie de la peur est aussi la leur.</p>
+    <p><strong>La boucle de la peur.</strong> La Bourse chute → les prêteurs se méfient → le crédit se ferme →
+    les entreprises coupent → les profits baissent → la Bourse chute. C'est pour casser cette spirale
+    que les banques centrales interviennent en pompier.</p>
+  </div>
+</section>
+
+<!-- ============ LEXIQUE ============ -->
+<section class="chapter" id="lexique">
+  <div class="eyebrow">Pour aller plus loin</div>
+  <h2>Le petit lexique de la machine</h2>
+  <div class="lex sans">
+    <div class="card"><b>Action</b>Un petit morceau de propriété d'une entreprise. Si l'entreprise prospère, l'action prend de la valeur et verse des dividendes.</div>
+    <div class="card"><b>Obligation</b>Une reconnaissance de dette : tu prêtes à un État ou une entreprise, qui te rembourse avec intérêts. Quand les taux montent, les vieilles obligations perdent de la valeur.</div>
+    <div class="card"><b>AUM (assets under management)</b>Les « actifs sous gestion » : le total de l'argent que les clients ont confié à un gérant. C'est la mesure de la taille des géants.</div>
+    <div class="card"><b>Hedge fund</b>Un fonds réservé aux gros investisseurs, libre de parier à la hausse comme à la baisse, souvent avec de l'argent emprunté. Petit en taille (4 200 Md$), grand en influence sur les prix.</div>
+    <div class="card"><b>Fonds souverain</b>La tirelire d'un État, souvent remplie par le pétrole (Norvège, Golfe) ou les excédents commerciaux (Chine, Singapour), investie pour les générations futures.</div>
+    <div class="card"><b>Banque centrale</b>La banque des banques (Fed, BCE…). Elle fixe le « loyer de l'argent » — le taux directeur — et peut créer de la monnaie. C'est le thermostat de la machine.</div>
+    <div class="card"><b>Spread de crédit</b>Le supplément d'intérêt exigé d'un emprunteur risqué par rapport à un État sûr. Quand la peur monte, le spread s'écarte : c'est le pouls du marché.</div>
+    <div class="card"><b>Liquidité</b>La facilité à vendre vite sans faire baisser le prix. Une action Apple est très liquide ; une maison ne l'est pas. Les crises sont d'abord des pannes de liquidité.</div>
+    <div class="card"><b>Produit dérivé</b>Un contrat dont la valeur « dérive » d'autre chose (un taux, un baril, une devise). Sert à s'assurer contre un risque… ou à parier dessus. Les volumes sont vertigineux : 7 900 Md$ par jour rien que sur les taux.</div>
+  </div>
+</section>
+
+<!-- ============ SOURCES ============ -->
+<section class="chapter" id="sources">
+  <div class="eyebrow">Honnêteté des chiffres</div>
+  <h2>Sources et limites</h2>
+  <div class="prose">
+    <p>Les chiffres viennent des meilleures sources publiques, mais leurs dates (2024–2025) et leurs
+    périmètres diffèrent, et certains se recoupent (l'argent d'une caisse de retraite géré par BlackRock
+    est compté deux fois). Lis tout comme des <strong>ordres de grandeur fiables</strong>, pas comme une
+    comptabilité au centime.</p>
+  </div>
+  <ul class="sources sans">
+    <li><a href="https://www.ubs.com/global/en/media/display-page-ndp/en-20250618-gwr-2025.html">UBS Global Wealth Report 2025</a> — patrimoine mondial des ménages : 471 000 Md$ (fin 2024, 56 pays).</li>
+    <li><a href="https://www.thinkingaheadinstitute.org/news/article/worlds-largest-asset-managers-aum-surges-to-record-140-trillion-driven-by-north-america-and-passives/">Thinking Ahead Institute / WTW</a> — top 500 gérants d'actifs : 139 900 Md$ fin 2024 ; top 20 = 47 %.</li>
+    <li><a href="https://www.thinkingaheadinstitute.org/research-papers/global-pension-assets-study-2025/">Global Pension Assets Study 2025</a> — retraites : 58 500 Md$ (22 pays).</li>
+    <li><a href="https://www.bis.org/press/p250930.htm">BIS Triennial Survey 2025</a> — devises : 9 600 Md$/jour ; dérivés de taux : 7 900 Md$/jour ; dollar dans 89 % des échanges.</li>
+    <li><a href="https://www.sifma.org/research/statistics/fact-book">SIFMA Capital Markets Fact Book 2025</a> — actions mondiales : 126 700 Md$ ; obligations : 145 100 Md$ (fin 2024).</li>
+    <li><a href="https://www.withintelligence.com/insights/billion-dollar-club-h1-2025/">With Intelligence, Billion Dollar Club H1 2025</a> — hedge funds : ≈ 4 200 Md$.</li>
+    <li><a href="https://globalswf.com/ranking">Global SWF 2025</a> — fonds souverains : > 13 000 Md$.</li>
+    <li><a href="https://www.gold.org/goldhub/research/market-primer/gold-market-primer-market-size-and-structure">World Gold Council</a> — or extrait : ≈ 220 000 tonnes ≈ 30 000 Md$ ; ≈ 361 Md$ échangés/jour.</li>
+    <li><a href="https://www.spglobal.com/market-intelligence/en/news-insights/articles/2025/4/the-worlds-largest-banks-by-assets-2025-88424232">S&amp;P Global 2025</a> — les 50 plus grandes banques : 101 600 Md$ d'actifs.</li>
+    <li><a href="https://beinsure.com/ranking/top-25-insurance-companies-worldwide-assets/">AM Best / Beinsure 2025</a> — assureurs par actifs (Berkshire, Allianz, Ping An…).</li>
+    <li>Savills Research — immobilier mondial ≈ 380 000 Md$ (estimation, majoritairement résidentiel).</li>
+  </ul>
+  <div class="kid" style="margin-top:2rem;">🌱 <b>Le mot de la fin :</b> cette machine n'est ni bonne ni méchante.
+  Elle transporte l'épargne de ceux qui en ont vers ceux qui en ont besoin pour construire. Mais elle
+  concentre aussi un pouvoir énorme chez très peu d'acteurs, et ses ondes de choc traversent la vie de
+  tout le monde — le prix du pain, le taux du crédit, l'emploi. La comprendre, c'est déjà ne plus la subir.</div>
+</section>
+
+</div>
+
+<div class="tooltip" id="tooltip" role="status"></div>
+
+<script>
+"use strict";
+/* ============================================================
+   Helpers
+============================================================ */
+const NS = "http://www.w3.org/2000/svg";
+const $  = (sel) => document.querySelector(sel);
+const fmtInt = new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 0 });
+const fmt1   = new Intl.NumberFormat("fr-FR", { maximumFractionDigits: 1 });
+function fmtMd(vT) { // value in thousands of Md$ (trillions) -> "xx xxx Md$"
+  return fmtInt.format(Math.round(vT * 1000)) + " Md$";
+}
+function svg(tag, attrs, parent) {
+  const n = document.createElementNS(NS, tag);
+  for (const k in attrs) n.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(n);
+  return n;
+}
+function div(cls, parent) {
+  const n = document.createElement("div");
+  if (cls) n.className = cls;
+  if (parent) parent.appendChild(n);
+  return n;
+}
+const cssVar = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+/* Tooltip singleton */
+const tip = $("#tooltip");
+function tipShow(evt, rows) {
+  // rows: [{key?: cssColor, val: string, lab: string}]
+  tip.replaceChildren();
+  rows.forEach(r => {
+    const line = document.createElement("div");
+    if (r.key) {
+      const k = document.createElement("span");
+      k.className = "tt-key"; k.style.background = r.key;
+      line.appendChild(k);
+    }
+    const v = document.createElement("span");
+    v.className = "tt-val"; v.textContent = r.val;
+    line.appendChild(v);
+    if (r.lab) {
+      const l = document.createElement("span");
+      l.className = "tt-lab"; l.textContent = " " + r.lab;
+      line.appendChild(l);
+    }
+    tip.appendChild(line);
+  });
+  tip.classList.add("on");
+  tipMove(evt);
+}
+function tipMove(evt) {
+  const pad = 14;
+  let x = evt.clientX + pad, y = evt.clientY + pad;
+  const r = tip.getBoundingClientRect();
+  if (x + r.width  > window.innerWidth  - 8) x = evt.clientX - r.width  - pad;
+  if (y + r.height > window.innerHeight - 8) y = evt.clientY - r.height - pad;
+  tip.style.left = x + "px"; tip.style.top = y + "px";
+}
+function tipHide() { tip.classList.remove("on"); }
+
+/* Simple sortable table builder */
+function buildTable(host, cols, rows) {
+  host.replaceChildren();
+  const t = document.createElement("table");
+  const thead = document.createElement("thead");
+  const trh = document.createElement("tr");
+  cols.forEach(c => {
+    const th = document.createElement("th");
+    th.textContent = c.label;
+    if (c.num) th.className = "num";
+    trh.appendChild(th);
+  });
+  thead.appendChild(trh); t.appendChild(thead);
+  const tb = document.createElement("tbody");
+  rows.forEach(row => {
+    const tr = document.createElement("tr");
+    cols.forEach(c => {
+      const td = document.createElement("td");
+      td.textContent = row[c.key];
+      if (c.num) td.className = "num";
+      tr.appendChild(td);
+    });
+    tb.appendChild(tr);
+  });
+  t.appendChild(tb);
+  const box = div("scrollbox", host);
+  box.appendChild(t);
+}
+
+/* ============================================================
+   DATA
+============================================================ */
+// Asset classes: color slots are fixed per entity across ALL charts
+const CLASSES = {
+  immo:   { label: "Immobilier & marchés privés", vari: "--c-immo"  },
+  oblig:  { label: "Obligations (dette)",          vari: "--c-oblig" },
+  actions:{ label: "Actions (Bourse)",             vari: "--c-actions" },
+  mone:   { label: "Dépôts & monétaire",           vari: "--c-mone"  },
+  or:     { label: "Or & matières premières",      vari: "--c-or"    },
+  credit: { label: "Crédits bancaires",            vari: "--c-credit"},
+  crypto: { label: "Cryptomonnaies",               vari: "--c-crypto"}
+};
+
+// Reservoirs (stocks) — in thousands of Md$ (trillions USD)
+const RESERVOIRS = [
+  { cls: "immo",    label: "Immobilier mondial",        v: 380, note: "surtout des logements, détenus en direct" },
+  { cls: "oblig",   label: "Obligations",               v: 145.1, note: "dette des États et entreprises (SIFMA 2024)" },
+  { cls: "actions", label: "Actions",                   v: 126.7, note: "capitalisation boursière mondiale (SIFMA 2024)" },
+  { cls: "mone",    label: "Dépôts bancaires & monétaire", v: 100, note: "estimation : comptes courants, livrets, fonds monétaires" },
+  { cls: "or",      label: "Or (tout l'or extrait)",    v: 30, note: "≈ 220 000 tonnes — tiendrait dans 4 piscines olympiques" },
+  { cls: "immo2",   label: "Marchés privés (private equity…)", v: 15, note: "entreprises non cotées, infrastructures", clsColor: "immo" },
+  { cls: "crypto",  label: "Cryptomonnaies",            v: 3.5, note: "bitcoin & co — jeune, petit, très agité" }
+];
+
+// Daily volumes — in Md$ (billions USD) per day
+const DEBITS = [
+  { label: "Devises (FX)",             v: 9600, note: "BIS, avril 2025 — +28 % depuis 2022" },
+  { label: "Dérivés de taux d'intérêt", v: 7900, note: "BIS, avril 2025" },
+  { label: "Obligations d'État US",    v: 900,  note: "Treasuries, SIFMA 2025" },
+  { label: "Actions américaines",      v: 600,  note: "NYSE + Nasdaq, ordre de grandeur" },
+  { label: "Or",                       v: 361,  note: "World Gold Council, 2025" }
+];
+
+// Sankey — values in thousands of Md$ (stylized, coherent totals)
+const SANKEY = {
+  cols: [
+    [ { id: "menages", label: "Ménages & familles", v: 270, note: "patrimoine financier (hors logements)" },
+      { id: "etats",   label: "États (fonds souverains)", v: 13.5 },
+      { id: "bc",      label: "Banques centrales (réserves)", v: 13 } ],
+    [ { id: "banques", label: "Banques (dépôts)", v: 95 },
+      { id: "pension", label: "Fonds de pension", v: 58.5 },
+      { id: "am",      label: "Fonds & gérants d'actifs", v: 56 },
+      { id: "assur",   label: "Assureurs (assurance-vie…)", v: 36 },
+      { id: "direct",  label: "Détention en direct", v: 24.5 },
+      { id: "swf",     label: "Fonds souverains", v: 13.5 },
+      { id: "reserves",label: "Réserves officielles", v: 13 } ],
+    [ { id: "m_oblig",  label: "Obligations", v: 96.5, cls: "oblig" },
+      { id: "m_actions",label: "Actions", v: 88, cls: "actions" },
+      { id: "m_credit", label: "Crédits & prêts", v: 70, cls: "credit" },
+      { id: "m_prive",  label: "Immobilier & marchés privés", v: 19.5, cls: "immo" },
+      { id: "m_mone",   label: "Monétaire", v: 14.5, cls: "mone" },
+      { id: "m_or",     label: "Or & matières premières", v: 6, cls: "or" },
+      { id: "m_crypto", label: "Crypto", v: 2, cls: "crypto" } ] ],
+  links: [
+    ["menages","banques",95], ["menages","pension",58.5], ["menages","am",56],
+    ["menages","assur",36], ["menages","direct",24.5],
+    ["etats","swf",13.5], ["bc","reserves",13],
+    ["banques","m_credit",70], ["banques","m_oblig",20], ["banques","m_mone",5],
+    ["pension","m_actions",27], ["pension","m_oblig",20], ["pension","m_prive",10], ["pension","m_mone",1.5],
+    ["am","m_actions",30], ["am","m_oblig",18], ["am","m_mone",6], ["am","m_prive",2],
+    ["assur","m_oblig",22], ["assur","m_actions",7], ["assur","m_prive",5], ["assur","m_mone",2],
+    ["direct","m_actions",16], ["direct","m_oblig",4], ["direct","m_or",2.5], ["direct","m_crypto",2],
+    ["swf","m_actions",8], ["swf","m_oblig",3], ["swf","m_prive",2.5],
+    ["reserves","m_oblig",9.5], ["reserves","m_or",3.5]
+  ]
+};
+
+// Giants — per family; values in thousands of Md$ unless unit says otherwise
+const FAMILIES = [
+  { id: "am", label: "Gérants d'actifs", metric: "Actifs gérés (AUM)",
+    sub: "Ils placent l'argent des autres — retraites, assureurs, particuliers — moyennant des frais.",
+    cap: "Sources : rapports T4 2025 / Thinking Ahead Institute. Amundi est le champion européen — et français.",
+    rows: [
+      ["BlackRock 🇺🇸", 14.0], ["Vanguard 🇺🇸", 11.6], ["Fidelity 🇺🇸", 6.8],
+      ["State Street 🇺🇸", 5.7], ["JP Morgan AM 🇺🇸", 3.9], ["Amundi 🇫🇷", 2.6], ["UBS AM 🇨🇭", 2.0] ] },
+  { id: "banques", label: "Banques", metric: "Total des actifs au bilan",
+    sub: "Elles collectent les dépôts et créent le crédit. Les quatre premières sont chinoises et d'État.",
+    cap: "Source : S&P Global, avril 2025. BNP Paribas est la première banque de la zone euro.",
+    rows: [
+      ["ICBC 🇨🇳", 6.6], ["Agricultural Bank of China 🇨🇳", 6.0], ["China Construction Bank 🇨🇳", 5.4],
+      ["Bank of China 🇨🇳", 4.8], ["JPMorgan Chase 🇺🇸", 4.0], ["HSBC 🇬🇧", 3.0], ["BNP Paribas 🇫🇷", 2.9] ] },
+  { id: "swf", label: "Fonds souverains", metric: "Actifs détenus",
+    sub: "Les tirelires des États — pétrole du Nord et du Golfe, excédents d'Asie.",
+    cap: "Source : Global SWF, 2025. Le fonds norvégien possède ≈ 1,5 % de toutes les actions cotées du monde.",
+    rows: [
+      ["Norvège — GPFG 🇳🇴", 2.0], ["Chine — CIC 🇨🇳", 1.33], ["Arabie saoudite — PIF 🇸🇦", 1.15],
+      ["Abu Dhabi — ADIA 🇦🇪", 1.11], ["Koweït — KIA 🇰🇼", 1.0], ["Singapour — GIC 🇸🇬", 0.94] ] },
+  { id: "pension", label: "Fonds de pension", metric: "Actifs détenus",
+    sub: "Ils transforment les cotisations d'aujourd'hui en retraites de demain. Les plus prudents des géants.",
+    cap: "Source : Thinking Ahead Institute, top 300 pension funds 2025.",
+    rows: [
+      ["GPIF — Japon 🇯🇵", 1.6], ["NPS — Corée du Sud 🇰🇷", 0.8], ["ABP — Pays-Bas 🇳🇱", 0.55],
+      ["CPP — Canada 🇨🇦", 0.5], ["CalPERS — Californie 🇺🇸", 0.5] ] },
+  { id: "assur", label: "Assureurs", metric: "Total des actifs",
+    sub: "Ils encaissent les primes aujourd'hui et paieront les sinistres demain — entre les deux, ils investissent tout, surtout en obligations.",
+    cap: "Sources : AM Best / Beinsure 2025. AXA est le champion français.",
+    rows: [
+      ["Ping An 🇨🇳", 1.6], ["Berkshire Hathaway 🇺🇸", 1.15], ["Allianz 🇩🇪", 1.09],
+      ["China Life 🇨🇳", 1.0], ["AXA 🇫🇷", 0.75] ] },
+  { id: "hf", label: "Hedge funds", metric: "Actifs gérés (AUM)",
+    sub: "Petits en taille mais hyperactifs : ils empruntent pour amplifier leurs paris et font une grosse part des volumes quotidiens.",
+    cap: "Sources : With Intelligence / InvestmentNews, 2025. Toute l'industrie (≈ 4 200 Md$) pèse moins qu'un tiers de BlackRock.",
+    rows: [
+      ["Bridgewater 🇺🇸", 0.092], ["Man Group 🇬🇧", 0.078], ["Millennium 🇺🇸", 0.075],
+      ["Citadel 🇺🇸", 0.066], ["D.E. Shaw 🇺🇸", 0.065] ] }
+];
+
+// Growth over time — thousands of Md$
+const GROWTH = {
+  years: [2000, 2005, 2010, 2015, 2020, 2025],
+  series: [
+    { label: "BlackRock",              vari: "--c-actions", vals: [0.2, 0.45, 3.56, 4.6, 8.7, 14.0] },
+    { label: "Vanguard",               vari: "--c-oblig",   vals: [0.56, 0.9, 1.6, 3.4, 7.1, 11.6] },
+    { label: "Hedge funds (industrie)", vari: "--c-serie3", vals: [0.5, 1.4, 1.9, 2.9, 3.6, 4.2] },
+    { label: "Norvège (GPFG)",         vari: "--c-serie4",  vals: [0.05, 0.24, 0.53, 0.85, 1.28, 2.0] },
+    { label: "Arabie saoudite (PIF)",  vari: "--c-serie5",  vals: [null, null, null, 0.15, 0.4, 1.15] }
+  ]
+};
+
+// Dependency network
+const NET = {
+  nodes: [
+    { id:"bc",     label:"Banques centrales", x:500, y:60,
+      blurb:"La Fed, la BCE, la Banque du Japon… Elles fixent le taux directeur — le loyer de l'argent à court terme — et peuvent créer de la monnaie. C'est le thermostat de toute la machine." },
+    { id:"infl",   label:"Inflation", x:790, y:120,
+      blurb:"La hausse générale des prix. C'est l'ennemi juré des banques centrales : au-dessus de ~2 % par an, elles serrent la vis." },
+    { id:"taux",   label:"Taux d'intérêt", x:500, y:215,
+      blurb:"Le prix du temps : ce que coûte un emprunt, ce que rapporte un prêt. Les taux longs se forment sur le marché obligataire, le plus puissant du monde." },
+    { id:"usd",    label:"Dollar US", x:215, y:265,
+      blurb:"La monnaie du monde : 89 % des échanges de devises l'impliquent, le pétrole se paie en dollars, la moitié des dettes internationales sont en dollars." },
+    { id:"actions",label:"Actions", x:700, y:330,
+      blurb:"La Bourse. Elle valorise les profits futurs des entreprises — c'est pourquoi elle déteste les taux qui montent (les profits lointains « valent » alors moins aujourd'hui)." },
+    { id:"credit", label:"Crédit aux entreprises", x:905, y:265,
+      blurb:"Les prêts et obligations des entreprises. Son thermomètre : le « spread », le supplément d'intérêt exigé des emprunteurs fragiles." },
+    { id:"immo",   label:"Immobilier", x:715, y:490,
+      blurb:"Le plus gros réservoir du monde, financé à crédit — donc à la merci des taux hypothécaires." },
+    { id:"petrole",label:"Pétrole & énergie", x:340, y:430,
+      blurb:"Le sang de l'économie physique. Son prix entre dans le coût du transport, du plastique, des engrais — donc dans tous les prix." },
+    { id:"or",     label:"Or", x:105, y:430,
+      blurb:"La valeur refuge millénaire. Il ne rapporte rien — il rassure. Il monte quand la peur monte et quand les taux réels baissent." },
+    { id:"metaux", label:"Métaux (cuivre…)", x:250, y:575,
+      blurb:"Cuivre, aluminium, lithium… Le « docteur cuivre » est réputé prédire la santé de l'industrie mondiale, Chine en tête." },
+    { id:"agri",   label:"Céréales & agriculture", x:495, y:590,
+      blurb:"Blé, maïs, soja. Dépend du climat, des engrais (donc du gaz), et de la géopolitique des greniers à blé." },
+    { id:"em",     label:"Pays émergents", x:60, y:150,
+      blurb:"Brésil, Inde, Indonésie… Souvent endettés en dollars : un dollar fort les étrangle ; des matières premières chères les enrichissent (pour les exportateurs)." },
+    { id:"geo",    label:"Géopolitique & guerres", x:150, y:590,
+      blurb:"Guerres, embargos, élections. L'étincelle imprévisible : elle frappe d'abord l'énergie et pousse tout le monde vers les refuges (or, dollar, obligations d'État)." }
+  ],
+  edges: [
+    { id:"e1",  from:"bc", to:"taux", sign:"+", short:"fixe le loyer de l'argent",
+      mech:"La banque centrale fixe le taux à court terme ; les taux longs du marché obligataire s'alignent en anticipant ses prochains mouvements." },
+    { id:"e2",  from:"taux", to:"actions", sign:"−", short:"des taux hauts pèsent sur la Bourse",
+      mech:"Quand l'argent sans risque rapporte 5 %, les profits futurs des entreprises « valent » moins aujourd'hui : les valorisations boursières se dégonflent." },
+    { id:"e3",  from:"taux", to:"immo", sign:"−", short:"le crédit immobilier renchérit",
+      mech:"Taux hypothécaires plus élevés → mensualités plus lourdes → moins d'acheteurs → les prix immobiliers se tassent." },
+    { id:"e4",  from:"taux", to:"usd", sign:"+", short:"les hauts taux attirent les capitaux",
+      mech:"Si les taux américains dépassent les autres, l'épargne mondiale achète du dollar pour capter ce rendement : le dollar monte." },
+    { id:"e5",  from:"usd", to:"petrole", sign:"−", short:"les matières premières se paient en dollars",
+      mech:"Dollar fort = pétrole plus cher pour tous les pays non américains → leur demande faiblit → pression baissière sur les prix (et inversement)." },
+    { id:"e6",  from:"usd", to:"em", sign:"−", short:"la dette émergente est en dollars",
+      mech:"Un dollar fort alourdit les remboursements des pays et entreprises émergents endettés en dollars — jusqu'à la crise (Argentine, Turquie…)." },
+    { id:"e7",  from:"petrole", to:"infl", sign:"+", short:"l'énergie entre dans tous les prix",
+      mech:"Le pétrole et le gaz renchérissent le transport, la chimie, les engrais, l'électricité… L'inflation se diffuse partout." },
+    { id:"e8",  from:"petrole", to:"agri", sign:"+", short:"engrais et carburants agricoles",
+      mech:"Les engrais azotés sont faits à partir de gaz ; les tracteurs et les cargos brûlent du carburant. Énergie chère = nourriture chère." },
+    { id:"e9",  from:"infl", to:"bc", sign:"+", short:"l'inflation force la banque centrale à agir",
+      mech:"C'est la boucle maîtresse : inflation au-dessus de la cible → hausse des taux directeurs → l'économie freine → l'inflation retombe (avec 1 à 2 ans de retard)." },
+    { id:"e10", from:"taux", to:"or", sign:"−", short:"l'or ne verse pas d'intérêts",
+      mech:"Quand les taux réels montent, garder de l'or « coûte » le rendement auquel on renonce : il séduit moins. Quand les taux réels baissent, il brille." },
+    { id:"e11", from:"geo", to:"petrole", sign:"+", short:"les chocs frappent l'offre d'énergie",
+      mech:"Guerre au Moyen-Orient, embargo, sabotage : l'offre de brut se contracte ou menace de le faire, et le prix bondit." },
+    { id:"e12", from:"geo", to:"or", sign:"+", short:"la peur cherche un refuge",
+      mech:"Quand le monde a peur, l'argent fuit vers ce qui ne dépend d'aucun État : l'or (et accessoirement le franc suisse et les Treasuries)." },
+    { id:"e13", from:"actions", to:"credit", sign:"+", short:"la panique boursière contamine le crédit",
+      mech:"Une chute boursière réveille la peur du défaut : les spreads s'écartent, se financer devient cher, les entreprises fragiles décrochent — ce qui refait chuter la Bourse." },
+    { id:"e14", from:"em", to:"metaux", sign:"+", short:"la croissance émergente tire les métaux",
+      mech:"Quand la Chine et les émergents construisent (villes, réseaux, voitures électriques), le cuivre et l'acier s'envolent. Quand ils toussent, le cuivre s'enrhume." },
+    { id:"e15", from:"credit", to:"immo", sign:"−", short:"le robinet du crédit",
+      mech:"Quand les prêteurs se méfient, ils prêtent moins et plus cher — et l'immobilier, qui vit de dette, cale." }
+  ],
+  scenarios: [
+    { id:"s1", label:"🏦 La banque centrale monte ses taux",
+      intro:"L'inflation est trop haute. La banque centrale serre la vis. Suivons l'onde de choc :",
+      steps:["e9","e1","e2","e3","e4","e5","e6","e10"] },
+    { id:"s2", label:"🛢️ Le pétrole flambe",
+      intro:"Un conflit éclate dans une région pétrolière. L'étincelle géopolitique embrase la machine :",
+      steps:["e11","e7","e8","e12","e9","e1","e2"] },
+    { id:"s3", label:"📉 Krach boursier",
+      intro:"Une bulle éclate, la Bourse dévisse. Regarde la peur se propager :",
+      steps:["e13","e15","e12","e9"] }
+  ]
+};
+
+/* ============================================================
+   Horizontal bar chart (single series, slot-1 or per-entity colors)
+============================================================ */
+function barChart(host, items, opts) {
+  // items: [{label, v, color, note}] sorted desc; opts: {unit, vmax, valueFmt}
+  host.replaceChildren();
+  const W = 940, rowH = 34, padL = 8, padR = 120, labelW = 250;
+  const H = items.length * rowH + 26;
+  const s = svg("svg", { viewBox: `0 0 ${W} ${H}`, width: "100%", role: "img",
+    "aria-label": opts.aria || "Diagramme en barres" });
+  s.style.minWidth = "620px";
+  const plotX = padL + labelW, plotW = W - plotX - padR;
+  const vmax = opts.vmax || Math.max(...items.map(d => d.v)) * 1.04;
+
+  // gridlines (solid hairlines) + axis values
+  const ticks = opts.ticks || 4;
+  for (let i = 0; i <= ticks; i++) {
+    const vx = plotX + (plotW * i / ticks);
+    svg("line", { x1: vx, y1: 2, x2: vx, y2: H - 22, stroke: cssVar("--grid"), "stroke-width": 1 }, s);
+    const tv = vmax * i / ticks;
+    const t = svg("text", { x: vx, y: H - 7, "text-anchor": "middle", "font-size": 11,
+      fill: cssVar("--ink-3"), style: "font-variant-numeric: tabular-nums;" }, s);
+    t.textContent = fmtInt.format(Math.round(tv * (opts.tickScale || 1)));
+  }
+
+  items.forEach((d, i) => {
+    const y = i * rowH + 5, bh = 20;
+    const w = Math.max(2, plotW * d.v / vmax);
+    // row label
+    const lab = svg("text", { x: plotX - 10, y: y + bh - 5, "text-anchor": "end",
+      "font-size": 12.5, fill: cssVar("--ink") }, s);
+    lab.textContent = d.label;
+    // bar: square at baseline, 4px rounded data-end
+    const p = `M ${plotX} ${y} H ${plotX + w - 4} Q ${plotX + w} ${y} ${plotX + w} ${y + 4}
+               V ${y + bh - 4} Q ${plotX + w} ${y + bh} ${plotX + w - 4} ${y + bh} H ${plotX} Z`;
+    const bar = svg("path", { d: p, fill: d.color }, s);
+    // value at the tip
+    const vt = svg("text", { x: plotX + w + 8, y: y + bh - 5, "font-size": 12.5,
+      "font-weight": 650, fill: cssVar("--ink"), style: "font-variant-numeric: tabular-nums;" }, s);
+    vt.textContent = opts.valueFmt(d.v);
+    // hit target bigger than the mark
+    const hit = svg("rect", { x: padL, y: y - 5, width: W - padL - 8, height: rowH,
+      fill: "transparent", tabindex: 0, role: "img",
+      "aria-label": d.label + " : " + opts.valueFmt(d.v) }, s);
+    const show = (evt) => {
+      bar.style.filter = "brightness(1.15)";
+      tipShow(evt.clientX !== undefined ? evt : fakeEvt(hit), [
+        { key: d.color, val: opts.valueFmt(d.v), lab: d.label },
+        ...(d.note ? [{ val: "", lab: d.note }] : [])
+      ]);
+    };
+    hit.addEventListener("pointermove", show);
+    hit.addEventListener("pointerleave", () => { bar.style.filter = ""; tipHide(); });
+    hit.addEventListener("focus", show);
+    hit.addEventListener("blur", () => { bar.style.filter = ""; tipHide(); });
+  });
+  host.appendChild(s);
+}
+function fakeEvt(node) {
+  const r = node.getBoundingClientRect();
+  return { clientX: r.left + r.width / 2, clientY: r.top + 10 };
+}
+
+/* ============================================================
+   Chapter 1 — reservoirs & debits
+============================================================ */
+(function () {
+  const items = RESERVOIRS.map(d => ({
+    label: d.label, v: d.v, note: d.note,
+    color: cssVar(CLASSES[d.clsColor || d.cls] ? CLASSES[d.clsColor || d.cls].vari : "--c-actions")
+  }));
+  barChart($("#viz-reservoirs"), items, {
+    aria: "Taille des grandes classes d'actifs mondiales",
+    valueFmt: v => fmtMd(v), tickScale: 1000,
+    ticks: 4
+  });
+  buildTable($("#tbl-reservoirs"),
+    [ { key: "label", label: "Réservoir" }, { key: "val", label: "Valeur (Md$)", num: true }, { key: "note", label: "Note" } ],
+    RESERVOIRS.map(d => ({ label: d.label, val: fmtInt.format(d.v * 1000), note: d.note })));
+
+  const debitItems = DEBITS.map(d => ({ label: d.label, v: d.v, note: d.note, color: cssVar("--c-actions") }));
+  barChart($("#viz-debits"), debitItems, {
+    aria: "Volumes échangés chaque jour sur les grands marchés",
+    valueFmt: v => fmtInt.format(v) + " Md$/jour",
+    ticks: 4
+  });
+  buildTable($("#tbl-debits"),
+    [ { key: "label", label: "Marché" }, { key: "val", label: "Volume (Md$/jour)", num: true }, { key: "note", label: "Note" } ],
+    DEBITS.map(d => ({ label: d.label, val: fmtInt.format(d.v), note: d.note })));
+})();
+
+/* ============================================================
+   Chapter 2 — Sankey
+============================================================ */
+(function () {
+  const host = $("#viz-sankey");
+  const W = 960, H = 640, nodeW = 14, padY = 26, topY = 16;
+  const colX = [70, 452, 838];
+  const s = svg("svg", { viewBox: `0 0 ${W} ${H}`, width: "100%", role: "img",
+    "aria-label": "Diagramme de flux : épargnants, intermédiaires, réservoirs" });
+  s.style.minWidth = "760px";
+
+  // scale: fit the biggest column
+  const colTotals = SANKEY.cols.map(c => c.reduce((a, n) => a + n.v, 0));
+  const maxTotal = Math.max(...colTotals);
+  const usable = H - topY - 20 - padY * (Math.max(...SANKEY.cols.map(c => c.length)) - 1);
+  const k = usable / maxTotal;
+
+  // layout nodes
+  const nodes = {};
+  SANKEY.cols.forEach((col, ci) => {
+    const total = colTotals[ci];
+    const colH = total * k + padY * (col.length - 1);
+    let y = topY + (H - topY - 20 - colH) / 2;
+    col.forEach(n => {
+      nodes[n.id] = { ...n, ci, x: colX[ci], y, h: Math.max(3, n.v * k), outOff: 0, inOff: 0 };
+      y += Math.max(3, n.v * k) + padY;
+    });
+  });
+
+  // links (drawn first, under nodes)
+  const gL = svg("g", {}, s);
+  SANKEY.links.forEach(([fromId, toId, v]) => {
+    const a = nodes[fromId], b = nodes[toId];
+    const th = Math.max(1.6, v * k);
+    const y1 = a.y + a.outOff + th / 2, y2 = b.y + b.inOff + th / 2;
+    a.outOff += th; b.inOff += th;
+    const x1 = a.x + nodeW, x2 = b.x;
+    const mx = (x1 + x2) / 2;
+    const cls = b.cls; // color by destination asset class; neutral otherwise
+    const stroke = cls ? cssVar(CLASSES[cls].vari) : "";
+    const path = svg("path", {
+      d: `M ${x1} ${y1} C ${mx} ${y1}, ${mx} ${y2}, ${x2} ${y2}`,
+      fill: "none", "stroke-width": th,
+      stroke: stroke || "currentColor", opacity: cls ? 0.38 : 0
+    }, gL);
+    if (!cls) { path.setAttribute("stroke", cssVar("--flow-neutral")); path.setAttribute("opacity", 1); }
+    path.style.cursor = "default";
+    path.style.pointerEvents = "stroke";
+    const show = (evt) => {
+      path.setAttribute("opacity", cls ? 0.7 : 1);
+      if (!cls) path.setAttribute("stroke", cssVar("--ink-3"));
+      tipShow(evt, [
+        { key: stroke || cssVar("--ink-3"), val: fmtMd(v), lab: a.label + " → " + b.label } ]);
+    };
+    path.addEventListener("pointermove", show);
+    path.addEventListener("pointerleave", () => {
+      path.setAttribute("opacity", cls ? 0.38 : 1);
+      if (!cls) path.setAttribute("stroke", cssVar("--flow-neutral"));
+      tipHide();
+    });
+  });
+
+  // nodes + labels
+  for (const id in nodes) {
+    const n = nodes[id];
+    const color = n.cls ? cssVar(CLASSES[n.cls].vari) : cssVar("--ink-2");
+    svg("rect", { x: n.x, y: n.y, width: nodeW, height: n.h, rx: 3, fill: color }, s);
+    const anchor = n.ci === 2 ? "end" : "start";
+    const lx = n.ci === 2 ? n.x - 8 : n.x + nodeW + 8;
+    const label = svg("text", { x: lx, y: n.y + Math.min(n.h / 2 + 4, 14), "text-anchor": anchor,
+      "font-size": 12.5, "font-weight": 600, fill: cssVar("--ink") }, s);
+    label.textContent = n.label;
+    const val = svg("text", { x: lx, y: n.y + Math.min(n.h / 2 + 4, 14) + 14, "text-anchor": anchor,
+      "font-size": 11, fill: cssVar("--ink-3"), style: "font-variant-numeric: tabular-nums;" }, s);
+    val.textContent = fmtMd(n.v);
+  }
+
+  // column headers
+  [["Les épargnants", 70, "start"], ["Les intermédiaires", 452 + 7, "middle"], ["Les réservoirs", 838 + nodeW, "end"]]
+    .forEach(([t, x, anchor]) => {
+      const h = svg("text", { x, y: 12, "text-anchor": anchor, "font-size": 11.5,
+        "font-weight": 700, fill: cssVar("--brass"),
+        style: "letter-spacing:0.08em; text-transform:uppercase;" }, s);
+      h.textContent = t;
+    });
+
+  host.appendChild(s);
+
+  // legend (asset classes)
+  const leg = $("#leg-sankey");
+  ["actions","oblig","credit","immo","mone","or","crypto"].forEach(id => {
+    const k2 = document.createElement("span");
+    k2.className = "key";
+    const sw = document.createElement("span");
+    sw.className = "sw"; sw.style.background = cssVar(CLASSES[id].vari);
+    k2.appendChild(sw);
+    k2.appendChild(document.createTextNode(CLASSES[id].label));
+    leg.appendChild(k2);
+  });
+
+  buildTable($("#tbl-sankey"),
+    [ { key: "from", label: "De" }, { key: "to", label: "Vers" }, { key: "v", label: "Montant (Md$)", num: true } ],
+    SANKEY.links.map(([f, t, v]) => {
+      const find = id => { for (const c of SANKEY.cols) { const n = c.find(x => x.id === id); if (n) return n.label; } return id; };
+      return { from: find(f), to: find(t), v: fmtInt.format(v * 1000) };
+    }));
+})();
+
+/* ============================================================
+   Chapter 3 — Giants with family filter
+============================================================ */
+(function () {
+  const filters = $("#fam-filters");
+  let current = "am";
+  FAMILIES.forEach(f => {
+    const b = document.createElement("button");
+    b.type = "button"; b.textContent = f.label;
+    b.setAttribute("aria-pressed", f.id === current ? "true" : "false");
+    b.addEventListener("click", () => { current = f.id; render(); });
+    b.dataset.fam = f.id;
+    filters.appendChild(b);
+  });
+  function render() {
+    filters.querySelectorAll("button").forEach(b =>
+      b.setAttribute("aria-pressed", b.dataset.fam === current ? "true" : "false"));
+    const fam = FAMILIES.find(f => f.id === current);
+    $("#giants-title").textContent = "Les plus grands : " + fam.label.toLowerCase();
+    $("#giants-sub").textContent = fam.metric + " — en milliards de dollars. " + fam.sub;
+    $("#giants-cap").textContent = fam.cap;
+    const items = fam.rows.map(([label, v]) => ({ label, v, color: cssVar("--c-actions") }));
+    barChart($("#viz-giants"), items, {
+      aria: "Classement : " + fam.label,
+      valueFmt: v => fmtMd(v), tickScale: 1000, ticks: 4
+    });
+    buildTable($("#tbl-giants"),
+      [ { key: "label", label: "Acteur" }, { key: "val", label: fam.metric + " (Md$)", num: true } ],
+      fam.rows.map(([label, v]) => ({ label, val: fmtInt.format(v * 1000) })));
+  }
+  render();
+})();
+
+/* ============================================================
+   Chapter 4 — Growth line chart with crosshair
+============================================================ */
+(function () {
+  const host = $("#viz-growth");
+  const W = 940, H = 420, padL = 56, padR = 190, padT = 16, padB = 36;
+  const plotW = W - padL - padR, plotH = H - padT - padB;
+  const years = GROWTH.years;
+  const vmax = 15;
+  const xOf = (yr) => padL + plotW * (yr - years[0]) / (years[years.length - 1] - years[0]);
+  const yOf = (v) => padT + plotH * (1 - v / vmax);
+
+  const s = svg("svg", { viewBox: `0 0 ${W} ${H}`, width: "100%", role: "img",
+    "aria-label": "Croissance des grands acteurs financiers de 2000 à 2025" });
+  s.style.minWidth = "680px";
+
+  // grid + y ticks
+  for (let v = 0; v <= vmax; v += 5) {
+    svg("line", { x1: padL, y1: yOf(v), x2: padL + plotW, y2: yOf(v),
+      stroke: v === 0 ? cssVar("--baseline") : cssVar("--grid"), "stroke-width": 1 }, s);
+    const t = svg("text", { x: padL - 8, y: yOf(v) + 4, "text-anchor": "end", "font-size": 11,
+      fill: cssVar("--ink-3"), style: "font-variant-numeric: tabular-nums;" }, s);
+    t.textContent = fmtInt.format(v * 1000);
+  }
+  // x ticks
+  years.forEach(yr => {
+    const t = svg("text", { x: xOf(yr), y: H - 12, "text-anchor": "middle", "font-size": 11.5,
+      fill: cssVar("--ink-3"), style: "font-variant-numeric: tabular-nums;" }, s);
+    t.textContent = yr;
+  });
+
+  // lines + end markers + direct labels
+  GROWTH.series.forEach(sr => {
+    const color = cssVar(sr.vari);
+    let d = "";
+    years.forEach((yr, i) => {
+      const v = sr.vals[i];
+      if (v == null) return;
+      d += (d === "" ? "M" : "L") + ` ${xOf(yr)} ${yOf(v)} `;
+    });
+    svg("path", { d, fill: "none", stroke: color, "stroke-width": 2,
+      "stroke-linejoin": "round", "stroke-linecap": "round" }, s);
+    const lastV = sr.vals[sr.vals.length - 1];
+    // end marker with surface ring
+    svg("circle", { cx: xOf(2025), cy: yOf(lastV), r: 6, fill: cssVar("--surface") }, s);
+    svg("circle", { cx: xOf(2025), cy: yOf(lastV), r: 4, fill: color }, s);
+    // direct label at end (values are far enough apart: 14, 11.6, 4.2, 2, 1.15)
+    const lab = svg("text", { x: xOf(2025) + 12, y: yOf(lastV) + 4, "font-size": 12,
+      "font-weight": 600, fill: cssVar("--ink") }, s);
+    lab.textContent = sr.label;
+  });
+
+  // crosshair + hover layer
+  const cross = svg("line", { x1: 0, y1: padT, x2: 0, y2: padT + plotH,
+    stroke: cssVar("--baseline"), "stroke-width": 1, opacity: 0 }, s);
+  const hover = svg("rect", { x: padL, y: padT, width: plotW, height: plotH,
+    fill: "transparent" }, s);
+  hover.addEventListener("pointermove", (evt) => {
+    const rect = s.getBoundingClientRect();
+    const px = (evt.clientX - rect.left) * (W / rect.width);
+    let best = years[0], bd = Infinity;
+    years.forEach(yr => { const d2 = Math.abs(xOf(yr) - px); if (d2 < bd) { bd = d2; best = yr; } });
+    const xi = years.indexOf(best);
+    cross.setAttribute("x1", xOf(best)); cross.setAttribute("x2", xOf(best));
+    cross.setAttribute("opacity", 1);
+    const rows = [{ val: String(best), lab: "" }];
+    GROWTH.series.forEach(sr => {
+      const v = sr.vals[xi];
+      if (v == null) return;
+      rows.push({ key: cssVar(sr.vari), val: fmtMd(v), lab: sr.label });
+    });
+    tipShow(evt, rows);
+  });
+  hover.addEventListener("pointerleave", () => { cross.setAttribute("opacity", 0); tipHide(); });
+
+  host.appendChild(s);
+
+  // legend
+  const leg = $("#leg-growth");
+  GROWTH.series.forEach(sr => {
+    const k2 = document.createElement("span");
+    k2.className = "key";
+    const ln = document.createElement("span");
+    ln.className = "ln"; ln.style.background = cssVar(sr.vari);
+    k2.appendChild(ln);
+    k2.appendChild(document.createTextNode(sr.label));
+    leg.appendChild(k2);
+  });
+
+  buildTable($("#tbl-growth"),
+    [ { key: "serie", label: "Acteur" },
+      ...years.map((yr, i) => ({ key: "y" + i, label: String(yr), num: true })) ],
+    GROWTH.series.map(sr => {
+      const row = { serie: sr.label };
+      years.forEach((yr, i) => row["y" + i] = sr.vals[i] == null ? "—" : fmtInt.format(sr.vals[i] * 1000));
+      return row;
+    }));
+})();
+
+/* ============================================================
+   Chapter 5 — Dependency network + scenarios
+============================================================ */
+(function () {
+  const host = $("#viz-network");
+  const panel = $("#netpanel");
+  const W = 1000, H = 660, R = 34;
+  const s = svg("svg", { viewBox: `0 0 ${W} ${H}`, width: "100%", role: "img",
+    "aria-label": "Carte des influences entre marchés" });
+  s.style.minWidth = "640px";
+
+  const nodeById = {}; NET.nodes.forEach(n => nodeById[n.id] = n);
+  const edgeEls = {}, nodeEls = {};
+  let scenTimer = [];
+
+  // arrowheads
+  const defs = svg("defs", {}, s);
+  const mk = (id, fillMode) => {
+    const m = svg("marker", { id, viewBox: "0 0 10 10", refX: 9, refY: 5,
+      markerWidth: 7, markerHeight: 7, orient: "auto-start-reverse" }, defs);
+    svg("path", { d: "M 0 1 L 9 5 L 0 9 z",
+      fill: fillMode ? "context-stroke" : "none",
+      stroke: "context-stroke", "stroke-width": fillMode ? 0 : 1.6,
+      "stroke-linejoin": "round" }, m);
+  };
+  mk("arrow-plus", true);   // filled = same direction (+)
+  mk("arrow-minus", false); // hollow = inverse (−)
+
+  // edges
+  const gE = svg("g", {}, s);
+  NET.edges.forEach(e => {
+    const a = nodeById[e.from], b = nodeById[e.to];
+    const dx = b.x - a.x, dy = b.y - a.y, L = Math.hypot(dx, dy);
+    const ux = dx / L, uy = dy / L;
+    const x1 = a.x + ux * (R + 4), y1 = a.y + uy * (R + 4);
+    const x2 = b.x - ux * (R + 10), y2 = b.y - uy * (R + 10);
+    // slight curve for legibility
+    const mx = (x1 + x2) / 2 - uy * 22, my = (y1 + y2) / 2 + ux * 22;
+    const p = svg("path", {
+      d: `M ${x1} ${y1} Q ${mx} ${my} ${x2} ${y2}`,
+      fill: "none", stroke: cssVar("--ink-3"), "stroke-width": 1.6, opacity: 0.55,
+      "marker-end": e.sign === "+" ? "url(#arrow-plus)" : "url(#arrow-minus)",
+      class: "netedge"
+    }, gE);
+    p.style.pointerEvents = "stroke";
+    p.addEventListener("pointermove", (evt) => {
+      tipShow(evt, [
+        { val: a.label + " → " + b.label, lab: "(" + (e.sign === "+" ? "même sens" : "sens inverse") + ")" },
+        { val: "", lab: e.short }
+      ]);
+      p.setAttribute("opacity", 1); p.setAttribute("stroke-width", 2.6);
+    });
+    p.addEventListener("pointerleave", () => { tipHide(); if (!p.dataset.lit) { p.setAttribute("opacity", 0.55); p.setAttribute("stroke-width", 1.6); } });
+    p.addEventListener("click", () => showEdge(e));
+    edgeEls[e.id] = p;
+  });
+
+  // nodes
+  NET.nodes.forEach(n => {
+    const g = svg("g", { class: "netnode", tabindex: 0, role: "button",
+      "aria-label": n.label }, s);
+    svg("circle", { cx: n.x, cy: n.y, r: R, fill: cssVar("--surface"),
+      stroke: cssVar("--baseline"), "stroke-width": 1.5 }, g);
+    const words = n.label.split(" ");
+    // wrap label inside circle (2 lines max, small font)
+    let lines = [];
+    if (n.label.length <= 10) lines = [n.label];
+    else {
+      let l1 = "", l2 = "";
+      words.forEach(w => { if ((l1 + " " + w).trim().length <= 12 && !l2) l1 = (l1 + " " + w).trim(); else l2 = (l2 + " " + w).trim(); });
+      lines = l2 ? [l1, l2] : [l1];
+    }
+    lines.forEach((ln, i) => {
+      const t = svg("text", { x: n.x, y: n.y + (i - (lines.length - 1) / 2) * 13 + 4,
+        "text-anchor": "middle", "font-size": 10.5, "font-weight": 600, fill: cssVar("--ink") }, g);
+      t.textContent = ln;
+    });
+    g.addEventListener("click", () => showNode(n));
+    g.addEventListener("keydown", (evt) => { if (evt.key === "Enter" || evt.key === " ") { evt.preventDefault(); showNode(n); } });
+    nodeEls[n.id] = g;
+  });
+
+  function resetHighlight() {
+    scenTimer.forEach(t => clearTimeout(t)); scenTimer = [];
+    NET.edges.forEach(e => {
+      const p = edgeEls[e.id];
+      delete p.dataset.lit;
+      p.setAttribute("stroke", cssVar("--ink-3"));
+      p.setAttribute("opacity", 0.55); p.setAttribute("stroke-width", 1.6);
+    });
+    Object.values(nodeEls).forEach(g => g.setAttribute("opacity", 1));
+    document.querySelectorAll("#scenarios button").forEach(b => b.setAttribute("aria-pressed", "false"));
+  }
+
+  function litEdge(id) {
+    const p = edgeEls[id];
+    p.dataset.lit = "1";
+    p.setAttribute("stroke", cssVar("--brass"));
+    p.setAttribute("opacity", 1); p.setAttribute("stroke-width", 3);
+  }
+
+  function panelSet(title, bodyNodes) {
+    panel.replaceChildren();
+    const h = document.createElement("h4"); h.textContent = title; panel.appendChild(h);
+    bodyNodes.forEach(n => panel.appendChild(n));
+  }
+
+  function showNode(n) {
+    resetHighlight();
+    const ins = NET.edges.filter(e => e.to === n.id);
+    const outs = NET.edges.filter(e => e.from === n.id);
+    [...ins, ...outs].forEach(e => litEdge(e.id));
+    Object.keys(nodeEls).forEach(id => {
+      const connected = id === n.id || ins.some(e => e.from === id) || outs.some(e => e.to === id);
+      nodeEls[id].setAttribute("opacity", connected ? 1 : 0.3);
+    });
+    const p1 = document.createElement("p"); p1.className = "mech"; p1.textContent = n.blurb;
+    const nodes = [p1];
+    if (ins.length) {
+      const h5 = document.createElement("p"); h5.innerHTML = ""; h5.textContent = "Influencé par :"; h5.style.fontWeight = "700"; h5.style.margin = "10px 0 2px";
+      const ul = document.createElement("ul");
+      ins.forEach(e => { const li = document.createElement("li"); li.textContent = nodeById[e.from].label + " (" + e.sign + ") — " + e.short; ul.appendChild(li); });
+      nodes.push(h5, ul);
+    }
+    if (outs.length) {
+      const h5 = document.createElement("p"); h5.textContent = "Influence :"; h5.style.fontWeight = "700"; h5.style.margin = "10px 0 2px";
+      const ul = document.createElement("ul");
+      outs.forEach(e => { const li = document.createElement("li"); li.textContent = nodeById[e.to].label + " (" + e.sign + ") — " + e.short; ul.appendChild(li); });
+      nodes.push(h5, ul);
+    }
+    panelSet(n.label, nodes);
+  }
+
+  function showEdge(e) {
+    resetHighlight();
+    litEdge(e.id);
+    const p1 = document.createElement("p"); p1.className = "mech"; p1.textContent = e.mech;
+    panelSet(nodeById[e.from].label + " → " + nodeById[e.to].label +
+      (e.sign === "+" ? "  (même sens)" : "  (sens inverse)"), [p1]);
+  }
+
+  // scenarios
+  const scenHost = $("#scenarios");
+  NET.scenarios.forEach(sc => {
+    const b = document.createElement("button");
+    b.type = "button"; b.textContent = sc.label;
+    b.setAttribute("aria-pressed", "false");
+    b.addEventListener("click", () => runScenario(sc, b));
+    scenHost.appendChild(b);
+  });
+  const resetB = document.createElement("button");
+  resetB.type = "button"; resetB.textContent = "↺ Effacer";
+  resetB.addEventListener("click", () => {
+    resetHighlight();
+    panelSet("Explore la carte", [(() => { const p = document.createElement("p"); p.className = "mech";
+      p.textContent = "Clique sur un nœud pour voir ses connexions, ou lance un scénario."; return p; })()]);
+  });
+  scenHost.appendChild(resetB);
+
+  function runScenario(sc, btn) {
+    resetHighlight();
+    btn.setAttribute("aria-pressed", "true");
+    const intro = document.createElement("p"); intro.className = "mech"; intro.textContent = sc.intro;
+    const ol = document.createElement("ul");
+    panelSet(sc.label.replace(/^[^ ]+ /, ""), [intro, ol]);
+    const stepDelay = reducedMotion ? 0 : 1400;
+    sc.steps.forEach((eid, i) => {
+      const go = () => {
+        const e = NET.edges.find(x => x.id === eid);
+        litEdge(eid);
+        const li = document.createElement("li");
+        const b = document.createElement("b");
+        b.textContent = nodeById[e.from].label + " → " + nodeById[e.to].label + " (" + e.sign + ") ";
+        li.appendChild(b);
+        li.appendChild(document.createTextNode(e.mech));
+        ol.appendChild(li);
+        li.scrollIntoView({ block: "nearest", behavior: reducedMotion ? "auto" : "smooth" });
+      };
+      if (stepDelay === 0) go();
+      else scenTimer.push(setTimeout(go, i * stepDelay));
+    });
+  }
+
+  host.appendChild(s);
+
+  buildTable($("#tbl-network"),
+    [ { key: "from", label: "De" }, { key: "to", label: "Vers" }, { key: "sign", label: "Sens" }, { key: "mech", label: "Mécanisme" } ],
+    NET.edges.map(e => ({ from: nodeById[e.from].label, to: nodeById[e.to].label,
+      sign: e.sign === "+" ? "même sens" : "sens inverse", mech: e.mech })));
+})();
+
+/* Re-render nothing on theme switch: colors are read at build time from CSS vars.
+   Rebuild charts when the theme toggles so marks pick up the themed steps. */
+(function () {
+  const observer = new MutationObserver(() => location.reload());
+  observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+  const mq = window.matchMedia("(prefers-color-scheme: dark)");
+  if (mq.addEventListener) mq.addEventListener("change", () => location.reload());
+})();
+</script>
