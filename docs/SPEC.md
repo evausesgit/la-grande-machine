@@ -8,7 +8,8 @@
 Un **observatoire public de la machine financière** : chaque matin, l'app raconte
 ce qui a bougé sur les marchés, **qui** a probablement bougé, et **pourquoi** —
 chaque mouvement relié à ses causes via la carte des dépendances, en français
-lisible par un enfant curieux. L'historique s'accumule pour voir les évolutions.
+clair pour adultes curieux — pédagogie ludique, jargon traduit. L'historique
+s'accumule pour voir les évolutions.
 
 **URL** : https://themachine.ia-do-it.com (Coolify, VPS d'Eva)
 **Code** : GitHub public (aucun secret dans le repo)

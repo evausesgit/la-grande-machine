@@ -10,8 +10,9 @@ quels actifs, et surtout **pourquoi les prix montent ou descendent**.
    matières premières), et les chaînes de transmission entre eux.
 2. **Le film** — un suivi régulier des prix et des flux : ce qui a bougé, de combien,
    et l'explication en français simple de ce qui l'a causé.
-3. **La transmission** — tout doit rester lisible par un enfant curieux :
-   chaque mouvement relié à sa cause, chaque cause à ses conséquences.
+3. **La transmission** — un guide pour adultes curieux, sans jargon, qui garde
+   le plaisir d'apprendre : chaque mouvement relié à sa cause, chaque cause à
+   ses conséquences.
 
 ## État actuel
 
