@@ -75,7 +75,14 @@ Solution de repli documentée : appel direct de l'API Claude depuis l'app.
 1. **Le titre du jour** — une phrase : « Le pétrole s'enflamme et réveille les taux ».
 2. **Ce qui a bougé** — les 5–8 mouvements les plus significatifs (z-score), avec tuiles colorées.
 3. **Pourquoi** — le récit causal : événement → chaîne de transmission → conséquences, avec la mini-carte des dépendances du jour mise en évidence et les liens sources.
-4. **Le coin des acteurs** — quand un rapport COT/13F/bilan BC est tombé : qui s'est renforcé, qui a fui.
+4. **Le coin des acteurs** — les chiffres et les voix. Les chiffres : quand un
+   rapport COT/13F/bilan BC est tombé, qui s'est renforcé, qui a fui (phase 3).
+   Les voix : ce que disent les gérants dans leurs notes publiques — BlackRock
+   Investment Institute (hebdo), Amundi Investment Institute, PIMCO, mémos
+   d'Howard Marks (Oaktree), Vanguard, JPMorgan — quand une note éclaire un
+   mouvement du jour. Règles : citation courte reformulée + attribution + lien
+   (droit de citation), et toujours présentées comme des opinions de gérants,
+   jamais comme des faits.
 5. **À surveiller aujourd'hui** — le calendrier éco.
 6. **Le coin des curieux** — une notion pédagogique liée à l'actualité du jour (rotation du lexique v1).
 
@@ -129,7 +136,7 @@ la-grande-machine/
 | Phase | Livrable | Critère de fin |
 |---|---|---|
 | **P1 — Squelette** | App déployée sur Coolify à l'URL cible, DB, collecte des prix quotidiens, page `/` avec tuiles | les prix du jour s'affichent en ligne |
-| **P2 — Le moteur** | z-scores, corrélations, graphe des dépendances en base, `GET /api/journee`, `POST /api/brief`, routine matinale → **premier brief automatique** | 5 briefs matinaux consécutifs sans intervention |
+| **P2 — Le moteur** | z-scores, corrélations, graphe des dépendances en base, `GET /api/journee`, `POST /api/brief`, routine matinale → **premier brief automatique**. La routine : un cron local lance `claude -p` avec la mission `scripts/brief-du-matin.md` (lit `/api/journee`, cherche les causes, consulte les notes de gérants, publie via `POST /api/brief`). Premier brief publié à la main le 7 juillet 2026. | 5 briefs matinaux consécutifs sans intervention |
 | **P3 — Les acteurs** | Collecteurs COT + bilans BC + flux ETF, page `/acteurs`, section « le coin des acteurs » dans le brief | un vendredi avec COT intégré au brief |
 | **P4 — La carte vivante** | `/carte` interactive branchée sur les corrélations réelles, `/marche/{code}`, `/archives` | la carte reflète les données de la veille |
 | **P5 — Bilan** | Rapport des limites données gratuites + backlog v2 (alertes, version anglaise, études de crises) | décision ensemble sur la suite |
