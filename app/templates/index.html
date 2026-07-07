@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>La Grande Machine — l'observatoire</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏦</text></svg>">
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="site">La Grande Machine — l'observatoire</div>
+  <h1>Les marchés, <span class="amp">expliqués</span></h1>
+  <p class="lede">Chaque jour : ce qui a bougé, pourquoi, et ce que ça entraîne.
+  <a href="/comprendre">Nouveau ici ? Commence par comprendre la machine →</a></p>
+</header>
+
+{% if brief %}
+<section class="brief">
+  <div class="eyebrow">Le brief du {{ brief.date.strftime("%d/%m/%Y") }}</div>
+  <h2>{{ brief.title }}</h2>
+  <div class="brief-body">{{ brief.body_md }}</div>
+</section>
+{% else %}
+<section class="brief brief-vide">
+  <div class="eyebrow">Le brief du matin</div>
+  <p>Le premier brief expliqué arrive bientôt (phase 2). En attendant, les instruments
+  de bord ci-dessous sont alimentés chaque jour.</p>
+</section>
+{% endif %}
+
+{% if notables %}
+<section>
+  <div class="eyebrow">Ça a vraiment bougé</div>
+  <p class="hint">Mouvements inhabituels : la variation du jour dépasse 1,5 fois la nervosité
+  habituelle des 30 dernières séances (z-score).</p>
+  <div class="tiles">
+    {% for m in notables %}
+    <div class="tile notable">
+      <div class="lab">{{ m.nom }}</div>
+      <div class="val">{{ m.valeur | fmt_valeur(m.decimales) }} <span class="unit">{{ m.unite }}</span></div>
+      <div class="delta {{ 'up' if m.variation > 0 else 'down' }}">{{ m | fmt_variation }}</div>
+      <div class="sub">z = {{ m.z_score }} · {{ m.date }}</div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% for fam_id, fam in familles.items() %}
+{% set liste = par_famille.get(fam_id, []) %}
+{% if liste %}
+<section>
+  <div class="eyebrow">{{ fam.label }}</div>
+  <p class="hint">{{ fam.blurb }}</p>
+  <div class="tiles">
+    {% for m in liste %}
+    <div class="tile">
+      <div class="lab">{{ m.nom }}</div>
+      <div class="val">{{ m.valeur | fmt_valeur(m.decimales) }} <span class="unit">{{ m.unite }}</span></div>
+      <div class="delta {{ 'up' if m.variation > 0 else ('down' if m.variation < 0 else '') }}">{{ m | fmt_variation }}</div>
+      <div class="sub">au {{ m.date }}{% if m.z_score is not none and m.z_score|abs >= 1.5 %} · inhabituel (z = {{ m.z_score }}){% endif %}</div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+{% endfor %}
+
+<footer>
+  <p><a href="/comprendre">Comprendre la machine (le guide)</a> ·
+     <a href="/api/sante">Santé des données</a> ·
+     <a href="https://github.com/evausesgit/la-grande-machine">Code source</a></p>
+  <p class="hint">Outil pédagogique — ceci n'est pas un conseil d'investissement.
+  Données : Yahoo Finance (non officiel), FRED. La date affichée sur chaque tuile
+  est celle de la dernière donnée disponible.</p>
+</footer>
+
+</div>
+</body>
+</html>
