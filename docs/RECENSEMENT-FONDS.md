@@ -33,8 +33,8 @@ Constats transverses :
 | Berkshire Hathaway Inc | 0001067983 | Conviction | ~40 lignes, le plus pédagogique |
 | Pershing Square Capital Management | 0001336528 | Conviction | ~10 lignes, très concentré |
 | Fundsmith LLP | 0001569205 | Conviction | Qualité/croissance, pendant UK de Comgest |
-| Scion Asset Management | 0001649339 | Conviction | Petit, mouvements très commentés dans la presse |
-| BlackRock Inc | 0001364742 | Géant | Milliers de lignes → top N + concentration seulement |
+| Scion Asset Management | 0001649339 | Conviction | Petit, très commenté dans la presse. Dernier 13F : T3 2025 (fonds fermé fin 2025) |
+| BlackRock Inc | 0002012383 | Géant | Milliers de lignes → top N seulement. CIK changé à la réorganisation d'oct. 2024 (l'ancien 0001364742 s'arrête à juin 2024) |
 | Vanguard Group Inc | 0000102909 | Géant | idem |
 | State Street Corp | 0000093751 | Géant | idem |
 | FMR LLC (Fidelity) | 0000315066 | Géant | idem |

@@ -53,3 +53,21 @@ h1 .amp { color: var(--brass); }
 
 footer { margin-top: 4rem; border-top: 1px solid var(--hairline); padding-top: 1.2rem;
          font-size: 0.9rem; }
+
+/* /fonds — les portefeuilles des gérants */
+.gerants { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 14px; }
+.gerant { background: var(--surface); border: 1px solid var(--hairline);
+          border-radius: 12px; padding: 14px 18px 16px; }
+.gerant h2 { font-family: Charter, Cambria, Georgia, serif; font-size: 1.15rem; margin: 0.2rem 0 0.1rem; }
+.gerant .pays { font-size: 0.72rem; font-weight: 400; color: var(--ink-3); margin-left: 4px; }
+.fonds-bloc { margin-top: 10px; }
+.fonds-nom { font-weight: 650; font-size: 0.92rem; }
+.fonds-nom .isin { font-weight: 400; font-size: 0.72rem; color: var(--ink-3); }
+.pf { width: 100%; border-collapse: collapse; font-size: 0.88rem; margin-top: 6px; }
+.pf th { text-align: left; font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase;
+         color: var(--ink-3); font-weight: 600; padding: 2px 6px; }
+.pf td { padding: 3px 6px; border-top: 1px solid var(--hairline); }
+.pf .rang { color: var(--ink-3); font-size: 0.75rem; width: 1.6em; }
+.pf .num { text-align: right; font-variant-numeric: tabular-nums; }
+.gerant .sub { font-size: 0.72rem; color: var(--ink-3); margin-top: 8px; }
+.a-venir { color: var(--ink-2); font-size: 0.88rem; font-style: italic; }
