@@ -138,4 +138,5 @@ la-grande-machine/
 
 Alertes temps réel, données intraday, version anglaise, comptes utilisateurs,
 flux RSS/email du brief, études de cas historiques (2008, 2020, 2022),
-positions détaillées par fonds (13F exploité au-delà de l'affichage brut).
+positions détaillées par fonds (13F exploité au-delà de l'affichage brut)
+— **devenu un chantier à part entière le 8 juillet 2026 : voir [SPEC-FONDS.md](SPEC-FONDS.md)**.
