@@ -7,11 +7,35 @@ import time
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from ..config import INSTRUMENTS
-from ..models import Instrument, PriceDaily
+from ..config import GERANTS, INSTRUMENTS
+from ..models import AssetManager, Fund, Instrument, PriceDaily
 from . import fred, yahoo
 
 log = logging.getLogger("collecte")
+
+
+def seed_gerants(session: Session) -> None:
+    """Crée/met à jour les gérants et leurs fonds du périmètre (idempotent)."""
+    managers = {m.slug: m for m in session.scalars(select(AssetManager))}
+    funds = {f.slug: f for f in session.scalars(select(Fund))}
+    for spec in GERANTS:
+        fields = {k: v for k, v in spec.items() if k != "fonds"}
+        manager = managers.get(spec["slug"])
+        if manager is None:
+            manager = AssetManager(**fields)
+            session.add(manager)
+            session.flush()
+        else:
+            for key, value in fields.items():
+                setattr(manager, key, value)
+        for fund_spec in spec["fonds"]:
+            fund = funds.get(fund_spec["slug"])
+            if fund is None:
+                session.add(Fund(manager_id=manager.id, **fund_spec))
+            else:
+                for key, value in fund_spec.items():
+                    setattr(fund, key, value)
+    session.commit()
 
 
 def seed_instruments(session: Session) -> None:

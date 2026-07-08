@@ -51,6 +51,83 @@ INSTRUMENTS = [
     {"code": "move",     "name": "MOVE (peur sur les taux)",     "family": "volatilite", "source": "yahoo", "symbol": "^MOVE", "unit": "pts", "decimals": 1},
 ]
 
+# --- Le chantier fonds (docs/SPEC-FONDS.md + docs/RECENSEMENT-FONDS.md) ---
+# type: boutique (PDF mensuels, collecte en F3) | conviction_13f | geant_13f (EDGAR)
+# Pour un déclarant 13F, le « fonds » est son portefeuille agrégé d'actions US.
+GERANTS = [
+    # Conviction américaine — portefeuilles courts, très lisibles
+    {"slug": "berkshire", "nom": "Berkshire Hathaway", "pays": "États-Unis", "type": "conviction_13f",
+     "cik_sec": "0001067983", "site_web": "https://www.berkshirehathaway.com",
+     "blurb": "Warren Buffett — une quarantaine de lignes, l'anti-indice.",
+     "fonds": [{"slug": "berkshire-13f", "nom": "Portefeuille actions US (13F)", "devise": "USD"}]},
+    {"slug": "pershing-square", "nom": "Pershing Square", "pays": "États-Unis", "type": "conviction_13f",
+     "cik_sec": "0001336528", "site_web": "https://pershingsquareholdings.com",
+     "blurb": "Bill Ackman — une dizaine de lignes, concentration extrême.",
+     "fonds": [{"slug": "pershing-13f", "nom": "Portefeuille actions US (13F)", "devise": "USD"}]},
+    {"slug": "fundsmith", "nom": "Fundsmith", "pays": "Royaume-Uni", "type": "conviction_13f",
+     "cik_sec": "0001569205", "site_web": "https://www.fundsmith.co.uk",
+     "blurb": "Terry Smith — qualité/croissance, « n'achetez que de bonnes entreprises ».",
+     "fonds": [{"slug": "fundsmith-13f", "nom": "Portefeuille actions US (13F)", "devise": "USD"}]},
+    {"slug": "scion", "nom": "Scion Asset Management", "pays": "États-Unis", "type": "conviction_13f",
+     "cik_sec": "0001649339", "site_web": "https://www.sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK=0001649339",
+     "blurb": "Michael Burry (« The Big Short ») — petit portefeuille, paris tranchés.",
+     "fonds": [{"slug": "scion-13f", "nom": "Portefeuille actions US (13F)", "devise": "USD"}]},
+    # Les géants — quasi indiciels, on ne garde que le sommet de l'iceberg
+    {"slug": "blackrock", "nom": "BlackRock", "pays": "États-Unis", "type": "geant_13f",
+     # nouveau CIK depuis la réorganisation en holding d'octobre 2024
+     "cik_sec": "0002012383", "site_web": "https://www.blackrock.com",
+     "blurb": "Le plus gros gérant du monde (~11 500 Md$) — il possède un peu de tout.",
+     "fonds": [{"slug": "blackrock-13f", "nom": "Portefeuille actions US (13F, top 50)", "devise": "USD"}]},
+    {"slug": "vanguard", "nom": "Vanguard", "pays": "États-Unis", "type": "geant_13f",
+     "cik_sec": "0000102909", "site_web": "https://www.vanguard.com",
+     "blurb": "Le pionnier de la gestion indicielle à bas coût.",
+     "fonds": [{"slug": "vanguard-13f", "nom": "Portefeuille actions US (13F, top 50)", "devise": "USD"}]},
+    {"slug": "state-street", "nom": "State Street", "pays": "États-Unis", "type": "geant_13f",
+     "cik_sec": "0000093751", "site_web": "https://www.ssga.com",
+     "blurb": "L'inventeur de l'ETF (SPDR), troisième pilier du trio indiciel.",
+     "fonds": [{"slug": "state-street-13f", "nom": "Portefeuille actions US (13F, top 50)", "devise": "USD"}]},
+    {"slug": "fidelity", "nom": "Fidelity (FMR)", "pays": "États-Unis", "type": "geant_13f",
+     "cik_sec": "0000315066", "site_web": "https://www.fidelity.com",
+     "blurb": "Le géant de la gestion active américaine.",
+     "fonds": [{"slug": "fidelity-13f", "nom": "Portefeuille actions US (13F, top 50)", "devise": "USD"}]},
+    # Boutiques françaises — collecte PDF en phase F3
+    {"slug": "moneta", "nom": "Moneta AM", "pays": "France", "type": "boutique",
+     "site_web": "https://www.moneta.fr",
+     "blurb": "Référence du stock-picking France, reporting mensuel très riche.",
+     "fonds": [{"slug": "moneta-multi-caps", "nom": "Moneta Multi Caps", "isin": "FR0010298596",
+                "strategie": "Actions France, toutes tailles", "note_source": "Fiche + lettre mensuelles PDF, URL prévisible"}]},
+    {"slug": "independance-am", "nom": "Indépendance AM", "pays": "France", "type": "boutique",
+     "site_web": "https://www.independance-am.com",
+     "blurb": "Small caps value — l'un des meilleurs historiques d'Europe.",
+     "fonds": [{"slug": "independance-france-small", "nom": "Indépendance France Small & Mid", "isin": "LU0131510165",
+                "strategie": "Petites valeurs françaises", "note_source": "Reporting mensuel PDF daté (WordPress)"}]},
+    {"slug": "amiral-gestion", "nom": "Amiral Gestion", "pays": "France", "type": "boutique",
+     "site_web": "https://www.amiralgestion.com",
+     "blurb": "Value, petites capitalisations, lettres de gestion détaillées.",
+     "fonds": [{"slug": "sextant-pme", "nom": "Sextant PME",
+                "strategie": "PME européennes", "note_source": "Page publication stable par fonds/part"},
+               {"slug": "sextant-grand-large", "nom": "Sextant Grand Large",
+                "strategie": "Flexible international", "note_source": "Page publication stable par fonds/part"}]},
+    {"slug": "carmignac", "nom": "Carmignac", "pays": "France", "type": "boutique",
+     "site_web": "https://www.carmignac.fr",
+     "blurb": "Gestion globale, lettre du gérant trimestrielle abondante.",
+     "fonds": [{"slug": "carmignac-investissement", "nom": "Carmignac Investissement", "isin": "FR0010148981",
+                "strategie": "Actions internationales", "note_source": "Page documents par fonds, rapport mensuel"}]},
+    {"slug": "lfde", "nom": "La Financière de l'Échiquier", "pays": "France", "type": "boutique",
+     "site_web": "https://www.lfde.com",
+     "blurb": "Maison historique du stock-picking français.",
+     "fonds": [{"slug": "echiquier-agressor", "nom": "Echiquier Agressor",
+                "strategie": "Actions européennes opportunistes", "note_source": "Factsheet cdn.lfde.com à URL stable écrasée chaque mois — archivage obligatoire"}]},
+    {"slug": "comgest", "nom": "Comgest", "pays": "France", "type": "boutique",
+     "site_web": "https://www.comgest.com",
+     "blurb": "Qualité/croissance, discipline célèbre, horizon long.",
+     "fonds": [{"slug": "comgest-growth-europe", "nom": "Comgest Growth Europe", "isin": "IE0004766675",
+                "strategie": "Actions européennes qualité/croissance", "note_source": "Monthly report derrière porte de profil investisseur"}]},
+]
+
+# Combien de lignes on conserve par snapshot 13F
+TOP_N_13F = {"geant_13f": 50, "conviction_13f": 200}
+
 FAMILIES = {
     "indices":    {"label": "Indices actions",      "blurb": "La météo des Bourses mondiales."},
     "actions":    {"label": "Actions phares",       "blurb": "Quelques champions pour incarner les mouvements."},

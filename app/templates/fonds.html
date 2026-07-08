@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Les fonds des gérants — La Grande Machine</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏦</text></svg>">
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="site"><a href="/" style="color:inherit;text-decoration:none">La Grande Machine — l'observatoire</a></div>
+  <h1>Ce que détiennent <span class="amp">les gérants</span></h1>
+  <p class="lede">Les portefeuilles publiés par les grandes maisons de gestion : leurs
+  principales positions, et bientôt le pourquoi de leurs mouvements.
+  Des convictions, pas du temps réel : chaque portefeuille indique sa date.</p>
+</header>
+
+{% for type_id, type_info in types.items() %}
+{% set gerants = par_type.get(type_id, []) %}
+{% if gerants %}
+<section>
+  <div class="eyebrow">{{ type_info.label }}</div>
+  <p class="hint">{{ type_info.blurb }}</p>
+  <div class="gerants">
+    {% for g in gerants %}
+    <article class="gerant">
+      <h2>{{ g.gerant.nom }} <span class="pays">{{ g.gerant.pays }}</span></h2>
+      <p class="hint">{{ g.gerant.blurb }}</p>
+      {% for b in g.fonds %}
+      <div class="fonds-bloc">
+        {% if g.fonds | length > 1 or g.gerant.type == 'boutique' %}
+        <div class="fonds-nom">{{ b.fonds.nom }}{% if b.fonds.isin %} <span class="isin">{{ b.fonds.isin }}</span>{% endif %}</div>
+        {% endif %}
+        {% if b.snapshot %}
+        <table class="pf">
+          <thead><tr><th></th><th>Position</th><th class="num">Poids</th></tr></thead>
+          <tbody>
+            {% for p in b.top %}
+            <tr>
+              <td class="rang">{{ p.rang }}</td>
+              <td>{{ p.security.nom_canonique if p.security else p.libelle_brut }}</td>
+              <td class="num">{{ "%.1f" | format(p.poids_pct) | replace(".", ",") }} %</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        <div class="sub">
+          Portefeuille au {{ b.snapshot.date.strftime("%d/%m/%Y") }}
+          · {{ b.snapshot.nb_lignes_publiees }} lignes déclarées
+          {% if b.snapshot.encours %} · {{ (b.snapshot.encours / 1e9) | fmt_valeur(0) }} Md$ d'actions US{% endif %}
+          {% if b.snapshot.document %} · <a href="{{ b.snapshot.document.url }}">source SEC</a>{% endif %}
+        </div>
+        {% elif g.gerant.type == 'boutique' %}
+        <p class="a-venir">{{ b.fonds.strategie }}. Positions mensuelles et lettres du gérant : en préparation.</p>
+        {% else %}
+        <p class="a-venir">Premier portefeuille en cours de collecte…</p>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </article>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+{% endfor %}
+
+<footer>
+  <p><a href="/">← Retour à l'observatoire</a> ·
+     <a href="/comprendre">Comprendre la machine</a></p>
+  <p class="hint">Outil pédagogique — ceci n'est pas un conseil d'investissement.
+  Portefeuilles 13F : SEC EDGAR, déclarations trimestrielles (jusqu'à 45 jours de délai),
+  actions US uniquement, options exclues. Le poids est calculé sur le total déclaré.</p>
+</footer>
+
+</div>
+</body>
+</html>
