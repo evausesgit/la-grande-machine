@@ -1,0 +1,556 @@
+<title>La Grande Machine — rivières &amp; lacs</title>
+<style>
+  :root {
+    --paper: #f9f9f7;
+    --surface: #fcfcfb;
+    --ink: #0b0b0b;
+    --ink-2: #52514e;
+    --ink-3: #8a8880;
+    --hairline: rgba(11,11,11,0.10);
+    --grid: #e1e0d9;
+    --brass: #8a6d1f;
+    --brass-soft: rgba(138,109,31,0.12);
+    --flow-neutral: #6b6a64;
+    --c-actions: #2a78d6;
+    --c-oblig: #199e70;
+    --c-or: #c98500;
+    --c-mone: #4a3aa7;
+    --c-crypto: #d55181;
+    --tooltip-bg: #232320;
+    --tooltip-ink: #ffffff;
+    --lake-src: #b9b7ac;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #0d0d0d;
+      --surface: #1a1a19;
+      --ink: #ffffff;
+      --ink-2: #c3c2b7;
+      --ink-3: #8a887d;
+      --hairline: rgba(255,255,255,0.10);
+      --grid: #2c2c2a;
+      --brass: #d4b356;
+      --brass-soft: rgba(212,179,86,0.14);
+      --flow-neutral: #a5a49a;
+      --c-actions: #3987e5;
+      --c-oblig: #1baf7a;
+      --c-or: #c98500;
+      --c-mone: #9085e9;
+      --c-crypto: #d55181;
+      --tooltip-bg: #f2f1ec;
+      --tooltip-ink: #171716;
+      --lake-src: #55544e;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #0d0d0d;
+    --surface: #1a1a19;
+    --ink: #ffffff;
+    --ink-2: #c3c2b7;
+    --ink-3: #8a887d;
+    --hairline: rgba(255,255,255,0.10);
+    --grid: #2c2c2a;
+    --brass: #d4b356;
+    --brass-soft: rgba(212,179,86,0.14);
+    --flow-neutral: #a5a49a;
+    --c-actions: #3987e5;
+    --c-oblig: #1baf7a;
+    --c-or: #c98500;
+    --c-mone: #9085e9;
+    --c-crypto: #d55181;
+    --tooltip-bg: #f2f1ec;
+    --tooltip-ink: #171716;
+    --lake-src: #55544e;
+  }
+  :root[data-theme="light"] {
+    --paper: #f9f9f7;
+    --surface: #fcfcfb;
+    --ink: #0b0b0b;
+    --ink-2: #52514e;
+    --ink-3: #8a8880;
+    --hairline: rgba(11,11,11,0.10);
+    --grid: #e1e0d9;
+    --brass: #8a6d1f;
+    --brass-soft: rgba(138,109,31,0.12);
+    --flow-neutral: #6b6a64;
+    --c-actions: #2a78d6;
+    --c-oblig: #199e70;
+    --c-or: #c98500;
+    --c-mone: #4a3aa7;
+    --c-crypto: #d55181;
+    --tooltip-bg: #232320;
+    --tooltip-ink: #ffffff;
+    --lake-src: #b9b7ac;
+  }
+
+  html, body { background: var(--paper); color: var(--ink); }
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    line-height: 1.45;
+    padding: 28px clamp(16px, 4vw, 48px) 48px;
+    max-width: 1240px;
+    margin: 0 auto;
+  }
+  .eyebrow {
+    font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--brass); font-weight: 600;
+  }
+  h1 {
+    font-family: Charter, "Bitstream Charter", "Sitka Text", Cambria, Georgia, serif;
+    font-size: clamp(26px, 3.4vw, 38px);
+    font-weight: 700; line-height: 1.12; text-wrap: balance;
+    margin: 6px 0 10px;
+  }
+  .sub { color: var(--ink-2); max-width: 68ch; margin: 0 0 20px; }
+
+  .scenarios { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .scenarios button {
+    font: 600 14px/1 system-ui, sans-serif;
+    color: var(--ink-2);
+    background: var(--surface);
+    border: 1px solid var(--hairline);
+    border-radius: 999px;
+    padding: 9px 16px;
+    cursor: pointer;
+  }
+  .scenarios button:hover { border-color: var(--brass); color: var(--ink); }
+  .scenarios button:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+  .scenarios button.active {
+    background: var(--brass-soft); border-color: var(--brass);
+    color: var(--ink);
+  }
+  .scenario-note {
+    margin: 12px 0 4px; color: var(--ink-2); max-width: 76ch;
+    font-size: 14.5px; min-height: 2.6em;
+  }
+  .scenario-note strong { color: var(--ink); }
+
+  .scene-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--hairline);
+    border-radius: 12px;
+    background: var(--surface);
+    margin-top: 10px;
+  }
+  svg#scene { display: block; min-width: 860px; width: 100%; height: auto; }
+
+  .legend {
+    display: flex; flex-wrap: wrap; gap: 6px 18px; align-items: center;
+    margin-top: 14px; font-size: 13px; color: var(--ink-2);
+  }
+  .legend .chip { display: inline-flex; align-items: center; gap: 7px; }
+  .legend .swatch { width: 18px; height: 5px; border-radius: 3px; display: inline-block; }
+
+  .note {
+    margin-top: 18px; font-size: 13px; color: var(--ink-3); max-width: 82ch;
+    border-top: 1px solid var(--hairline); padding-top: 12px;
+  }
+
+  details { margin-top: 14px; font-size: 14px; }
+  details summary { cursor: pointer; color: var(--ink-2); }
+  table { border-collapse: collapse; margin-top: 10px; font-size: 13.5px; }
+  th, td { text-align: left; padding: 5px 16px 5px 0; border-bottom: 1px solid var(--hairline); }
+  td.num { font-variant-numeric: tabular-nums; text-align: right; padding-right: 0; }
+  th { color: var(--ink-3); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.06em; }
+
+  #tooltip {
+    position: fixed; pointer-events: none; z-index: 10;
+    background: var(--tooltip-bg); color: var(--tooltip-ink);
+    font-size: 13px; line-height: 1.35;
+    padding: 7px 10px; border-radius: 7px; max-width: 260px;
+    opacity: 0; transition: opacity 0.12s;
+  }
+  #tooltip.on { opacity: 1; }
+
+  text { font-family: system-ui, -apple-system, "Segoe UI", sans-serif; }
+  .lake-name { font-size: 13.5px; font-weight: 650; fill: var(--ink); }
+  .lake-val { font-size: 12px; fill: var(--ink-2); font-variant-numeric: tabular-nums; }
+  .col-title { font-size: 11.5px; font-weight: 600; letter-spacing: 0.12em; fill: var(--ink-3); text-transform: uppercase; }
+</style>
+
+<p class="eyebrow">La Grande Machine · Prototype</p>
+<h1>Le bassin versant de l’argent</h1>
+<p class="sub">Les <strong>lacs</strong> sont les stocks — là où l’argent dort ; leur taille dit combien.
+Les <strong>rivières</strong> sont les flux — l’argent qui coule d’un lac à l’autre ; leur largeur dit le débit,
+et les particules montrent le sens du courant. Choisis un scénario et regarde la machine réagir.</p>
+
+<div class="scenarios" role="group" aria-label="Scénarios">
+  <button data-scn="calme" class="active">Journée calme</button>
+  <button data-scn="qe">La banque centrale injecte</button>
+  <button data-scn="riskoff">Fuite vers la sécurité</button>
+</div>
+<p class="scenario-note" id="scn-note"></p>
+
+<div class="scene-wrap">
+  <svg id="scene" viewBox="0 0 1200 660" role="img"
+       aria-label="Carte animée des flux financiers : l’épargne coule des ménages vers les collecteurs, puis vers les grandes mers d’actifs"></svg>
+</div>
+
+<div class="legend" id="legend"></div>
+
+<details>
+  <summary>Voir les chiffres en tableau</summary>
+  <div style="overflow-x:auto"><table id="flow-table"></table></div>
+</details>
+
+<p class="note">Chiffres : <strong>ordres de grandeur illustratifs</strong> (1&nbsp;T$ = 1&nbsp;000 milliards de dollars ;
+débits en T$/an). Dans l’app, les largeurs et les vitesses seront branchées sur les données réelles :
+flux ETF quotidiens, rapports COT de la CFTC, bilans des banques centrales. Outil pédagogique — pas un conseil d’investissement.</p>
+
+<div id="tooltip"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("scene");
+  const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* ---------- données (ordres de grandeur illustratifs) ---------- */
+
+  const LAKES = [
+    { id: "bc",  name: "Banque centrale",       x: 150, y: 130, stock: 25,  col: "src",   color: "lake-src" },
+    { id: "men", name: "Ménages & entreprises", x: 150, y: 450, stock: 320, col: "src",   color: "lake-src" },
+
+    { id: "fdp", name: "Fonds de pension",  x: 500, y: 125, stock: 55,  col: "mid", color: "lake-src" },
+    { id: "ass", name: "Assureurs",         x: 500, y: 265, stock: 35,  col: "mid", color: "lake-src" },
+    { id: "ger", name: "Gérants d’actifs",  x: 500, y: 415, stock: 130, col: "mid", color: "lake-src" },
+    { id: "hf",  name: "Hedge funds",       x: 500, y: 545, stock: 5,   col: "mid", color: "lake-src" },
+
+    { id: "act", name: "Actions",     x: 980, y: 110, stock: 120, col: "asset", color: "c-actions" },
+    { id: "obl", name: "Obligations", x: 980, y: 260, stock: 140, col: "asset", color: "c-oblig" },
+    { id: "or",  name: "Or",          x: 980, y: 400, stock: 16,  col: "asset", color: "c-or" },
+    { id: "cry", name: "Crypto",      x: 980, y: 487, stock: 3,   col: "asset", color: "c-crypto" },
+    { id: "mon", name: "Monétaire",   x: 980, y: 588, stock: 9,   col: "asset", color: "c-mone" },
+  ];
+
+  const RIVERS = [
+    { id: "men-fdp", from: "men", to: "fdp", base: 3.0, color: "flow-neutral" },
+    { id: "men-ass", from: "men", to: "ass", base: 2.2, color: "flow-neutral" },
+    { id: "men-ger", from: "men", to: "ger", base: 4.0, color: "flow-neutral" },
+    { id: "men-hf",  from: "men", to: "hf",  base: 0.8, color: "flow-neutral" },
+    { id: "men-mon", from: "men", to: "mon", base: 1.5, color: "c-mone", bow: 130 },
+    { id: "bc-obl",  from: "bc",  to: "obl", base: 0.6, color: "c-oblig", bow: -40 },
+
+    { id: "fdp-act", from: "fdp", to: "act", base: 1.6, color: "c-actions" },
+    { id: "fdp-obl", from: "fdp", to: "obl", base: 1.4, color: "c-oblig" },
+    { id: "ass-obl", from: "ass", to: "obl", base: 1.7, color: "c-oblig" },
+    { id: "ass-act", from: "ass", to: "act", base: 0.5, color: "c-actions" },
+    { id: "ger-act", from: "ger", to: "act", base: 2.4, color: "c-actions" },
+    { id: "ger-obl", from: "ger", to: "obl", base: 1.3, color: "c-oblig" },
+    { id: "ger-or",  from: "ger", to: "or",  base: 0.25, color: "c-or" },
+    { id: "hf-act",  from: "hf",  to: "act", base: 0.5, color: "c-actions" },
+    { id: "hf-or",   from: "hf",  to: "or",  base: 0.2, color: "c-or" },
+    { id: "hf-cry",  from: "hf",  to: "cry", base: 0.25, color: "c-crypto" },
+  ];
+
+  const SCENARIOS = {
+    calme: {
+      label: "Journée calme",
+      note: "<strong>Journée calme.</strong> L’épargne des ménages coule régulièrement vers les collecteurs " +
+            "(fonds de pension, assureurs, gérants), qui la répartissent entre les grandes mers d’actifs. " +
+            "Rien ne déborde, rien ne s’assèche.",
+      mult: {},
+    },
+    qe: {
+      label: "La banque centrale injecte",
+      note: "<strong>La banque centrale injecte (« QE »).</strong> Elle crée de la monnaie et achète des obligations : " +
+            "sa rivière gonfle d’un coup. L’argent déplacé cherche du rendement ailleurs — " +
+            "les rivières vers les actions grossissent à leur tour.",
+      mult: { "bc-obl": 8, "fdp-act": 1.5, "ass-act": 1.5, "ger-act": 1.5, "hf-act": 1.4, "men-mon": 1.2 },
+    },
+    riskoff: {
+      label: "Fuite vers la sécurité",
+      note: "<strong>Fuite vers la sécurité.</strong> Une peur traverse les marchés : les rivières vers les actions " +
+            "et la crypto <strong>s’inversent</strong> (l’argent en sort), pendant que l’or, les obligations " +
+            "et le monétaire reçoivent des torrents.",
+      mult: { "fdp-act": -0.7, "ass-act": -0.7, "ger-act": -0.7, "hf-act": -0.9, "hf-cry": -0.9,
+              "ger-or": 3, "hf-or": 3, "fdp-obl": 1.8, "ass-obl": 1.8, "ger-obl": 1.8,
+              "men-mon": 2.2, "men-hf": 0.5 },
+    },
+  };
+
+  /* ---------- helpers ---------- */
+
+  const byId = {};
+  LAKES.forEach(l => { byId[l.id] = l; l.r = Math.max(12, 3.2 * Math.sqrt(l.stock)); });
+
+  function el(name, attrs, parent) {
+    const e = document.createElementNS(NS, name);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+  function mulberry32(a) {
+    return function () {
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  const fmtT = v => (Math.round(v * 10) / 10).toLocaleString("fr-FR", { minimumFractionDigits: v < 10 ? 1 : 0 });
+  const widthOf = f => 2.5 + 9 * Math.sqrt(Math.abs(f));
+
+  /* forme organique du lac (blob), graine fixe pour rester stable */
+  function blobPath(cx, cy, r, seed) {
+    const rnd = mulberry32(seed);
+    const n = 10, pts = [];
+    for (let i = 0; i < n; i++) {
+      const a = (i / n) * Math.PI * 2;
+      const rr = r * (1 + 0.16 * (rnd() - 0.5));
+      pts.push([cx + Math.cos(a) * rr, cy + Math.sin(a) * rr]);
+    }
+    let d = "";
+    for (let i = 0; i < n; i++) {
+      const p0 = pts[(i - 1 + n) % n], p1 = pts[i], p2 = pts[(i + 1) % n], p3 = pts[(i + 2) % n];
+      const c1 = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+      const c2 = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+      if (i === 0) d += `M ${p1[0].toFixed(1)} ${p1[1].toFixed(1)} `;
+      d += `C ${c1[0].toFixed(1)} ${c1[1].toFixed(1)} ${c2[0].toFixed(1)} ${c2[1].toFixed(1)} ${p2[0].toFixed(1)} ${p2[1].toFixed(1)} `;
+    }
+    return d + "Z";
+  }
+
+  /* points d'ancrage : répartis sur le bord du lac, triés pour éviter les croisements */
+  const SPREAD = 0.85;
+  function computeAnchors() {
+    LAKES.forEach(l => { l.out = []; l.inn = []; });
+    RIVERS.forEach(rv => { byId[rv.from].out.push(rv); byId[rv.to].inn.push(rv); });
+    LAKES.forEach(l => {
+      l.out.sort((a, b) => byId[a.to].y - byId[b.to].y);
+      l.out.forEach((rv, i) => {
+        const f = l.out.length === 1 ? 0.5 : i / (l.out.length - 1);
+        const a = -SPREAD + f * 2 * SPREAD;
+        rv.p1 = [l.x + Math.cos(a) * l.r * 0.95, l.y + Math.sin(a) * l.r * 0.95];
+      });
+      l.inn.sort((a, b) => byId[a.from].y - byId[b.from].y);
+      l.inn.forEach((rv, i) => {
+        const f = l.inn.length === 1 ? 0.5 : i / (l.inn.length - 1);
+        const a = Math.PI + SPREAD - f * 2 * SPREAD;
+        rv.p2 = [l.x + Math.cos(a) * l.r * 0.95, l.y + Math.sin(a) * l.r * 0.95];
+      });
+    });
+  }
+
+  function riverD(rv) {
+    const [x1, y1] = rv.p1, [x2, y2] = rv.p2;
+    const dx = x2 - x1, bow = rv.bow || 0;
+    return `M ${x1} ${y1} C ${x1 + dx * 0.4} ${y1 + bow}, ${x2 - dx * 0.4} ${y2 + bow}, ${x2} ${y2}`;
+  }
+
+  /* échantillonnage du tracé (positions + normales) pour animer sans getPointAtLength à chaque frame */
+  function samplePath(d) {
+    const tmp = el("path", { d });
+    svg.appendChild(tmp);
+    const len = tmp.getTotalLength();
+    const step = 6, pts = [];
+    for (let s = 0; s <= len; s += step) {
+      const p = tmp.getPointAtLength(s);
+      pts.push([p.x, p.y]);
+    }
+    svg.removeChild(tmp);
+    const normals = pts.map((p, i) => {
+      const a = pts[Math.max(0, i - 1)], b = pts[Math.min(pts.length - 1, i + 1)];
+      const dx = b[0] - a[0], dy = b[1] - a[1], n = Math.hypot(dx, dy) || 1;
+      return [-dy / n, dx / n];
+    });
+    return { len, step, pts, normals };
+  }
+
+  /* ---------- construction de la scène ---------- */
+
+  computeAnchors();
+
+  const gBeds = el("g", {}, svg);
+  const gChannels = el("g", {}, svg);
+  const gParticles = el("g", {}, svg);
+  const gLakes = el("g", {}, svg);
+  const gLabels = el("g", {}, svg);
+  const gHover = el("g", {}, svg);
+
+  [["Les sources", 150], ["Les collecteurs", 500], ["Les mers d’actifs", 980]].forEach(([t, x]) => {
+    const e = el("text", { x, y: 34, "text-anchor": "middle", class: "col-title" }, gLabels);
+    e.textContent = t;
+  });
+
+  RIVERS.forEach(rv => {
+    rv.cur = rv.base; rv.tgt = rv.base;
+    rv.d = riverD(rv);
+    rv.geom = samplePath(rv.d);
+    const col = `var(--${rv.color})`;
+    rv.bed = el("path", { d: rv.d, fill: "none", "stroke-linecap": "round", opacity: 0.14 }, gBeds);
+    rv.bed.style.stroke = col;
+    rv.chan = el("path", { d: rv.d, fill: "none", "stroke-linecap": "round", opacity: 0.42 }, gChannels);
+    rv.chan.style.stroke = col;
+    rv.pgroup = el("g", {}, gParticles);
+    rv.particles = [];
+    rv.chevrons = el("g", {}, gParticles);
+    /* zone de survol invisible et large */
+    rv.hover = el("path", { d: rv.d, fill: "none", stroke: "rgba(0,0,0,0)", "stroke-width": 26 }, gHover);
+    rv.hover.style.cursor = "help";
+    rv.hover.addEventListener("pointermove", ev => showTip(ev, tipText(rv)));
+    rv.hover.addEventListener("pointerleave", hideTip);
+  });
+
+  LAKES.forEach((l, i) => {
+    const col = `var(--${l.color})`;
+    l.blob = el("path", { d: blobPath(l.x, l.y, l.r, 100 + i * 7) }, gLakes);
+    l.blob.style.fill = col;
+    l.blob.style.opacity = l.col === "asset" ? 0.38 : 0.45;
+    l.blob.style.stroke = col;
+    l.blob.style.strokeWidth = 1.6;
+    l.blob.style.cursor = "help";
+    l.blob.addEventListener("pointermove", ev =>
+      showTip(ev, `<strong>${l.name}</strong><br>Encours ≈ ${fmtT(l.stock)} T$ (illustratif)`));
+    l.blob.addEventListener("pointerleave", hideTip);
+
+    const inside = l.r >= 34 && l.col !== "asset";
+    let tx = l.x, ty, anchor = "middle";
+    if (inside) { ty = l.y - 3; }
+    else if (l.col === "asset") { tx = l.x + l.r + 10; ty = l.y + 1; anchor = "start"; }
+    else { ty = l.y + l.r + 16; }
+    const name = el("text", { x: tx, y: ty, "text-anchor": anchor, class: "lake-name" }, gLabels);
+    name.textContent = l.name;
+    const val = el("text", { x: tx, y: ty + 15, "text-anchor": anchor, class: "lake-val" }, gLabels);
+    val.textContent = `≈ ${fmtT(l.stock)} T$`;
+  });
+
+  /* ---------- tooltip ---------- */
+
+  const tip = document.getElementById("tooltip");
+  function tipText(rv) {
+    const f = rv.cur, from = byId[rv.from].name, to = byId[rv.to].name;
+    if (f < -0.02) return `<strong>${to} → ${from}</strong><br>Flux inversé — l’argent sort : ≈ ${fmtT(Math.abs(f))} T$/an (illustratif)`;
+    return `<strong>${from} → ${to}</strong><br>≈ ${fmtT(Math.abs(f))} T$/an (illustratif)`;
+  }
+  function showTip(ev, html) {
+    tip.innerHTML = html;
+    tip.classList.add("on");
+    const pad = 14;
+    let x = ev.clientX + pad, y = ev.clientY + pad;
+    const r = tip.getBoundingClientRect();
+    if (x + r.width > window.innerWidth - 8) x = ev.clientX - r.width - pad;
+    if (y + r.height > window.innerHeight - 8) y = ev.clientY - r.height - pad;
+    tip.style.left = x + "px"; tip.style.top = y + "px";
+  }
+  function hideTip() { tip.classList.remove("on"); }
+
+  /* ---------- légende ---------- */
+
+  const LEGEND = [
+    ["flow-neutral", "Épargne en route (pas encore investie)"],
+    ["c-actions", "Actions"], ["c-oblig", "Obligations"], ["c-or", "Or"],
+    ["c-crypto", "Crypto"], ["c-mone", "Monétaire"],
+  ];
+  document.getElementById("legend").innerHTML =
+    LEGEND.map(([c, t]) => `<span class="chip"><span class="swatch" style="background:var(--${c})"></span>${t}</span>`).join("");
+
+  /* ---------- particules ---------- */
+
+  function rebuildParticles(rv) {
+    rv.pgroup.textContent = "";
+    rv.particles = [];
+    if (reduced) return;
+    const f = Math.abs(rv.tgt);
+    if (f < 0.03) return;
+    const n = Math.max(2, Math.min(36, Math.round(rv.geom.len / 34 * (0.4 + Math.min(f, 5) / 2.2))));
+    const rnd = mulberry32(rv.id.length * 1013 + Math.round(rv.geom.len));
+    const w = widthOf(rv.tgt);
+    for (let i = 0; i < n; i++) {
+      const c = el("circle", { r: (1.1 + rnd() * 1.2).toFixed(2), opacity: 0.85 }, rv.pgroup);
+      c.style.fill = `var(--${rv.color})`;
+      rv.particles.push({
+        el: c,
+        s: rnd() * rv.geom.len,
+        lat: (rnd() - 0.5) * w * 0.7,
+        v: 40 + 26 * Math.sqrt(f) * (0.75 + rnd() * 0.5),
+      });
+    }
+  }
+
+  function drawChevrons(rv) {
+    rv.chevrons.textContent = "";
+    if (!reduced) return;
+    const dir = rv.cur < 0 ? -1 : 1;
+    [0.3, 0.55, 0.8].forEach(t => {
+      const i = Math.round((t * rv.geom.len) / rv.geom.step);
+      const p = rv.geom.pts[Math.min(i, rv.geom.pts.length - 1)];
+      const nrm = rv.geom.normals[Math.min(i, rv.geom.normals.length - 1)];
+      const tx = nrm[1] * dir, ty = -nrm[0] * dir;    /* tangente orientée */
+      const s = 5 + widthOf(rv.cur) * 0.25;
+      const d = `M ${p[0] - tx * s - nrm[0] * s} ${p[1] - ty * s - nrm[1] * s} L ${p[0] + tx * s} ${p[1] + ty * s} L ${p[0] - tx * s + nrm[0] * s} ${p[1] - ty * s + nrm[1] * s}`;
+      const c = el("path", { d, fill: "none", "stroke-width": 2.4, "stroke-linecap": "round" }, rv.chevrons);
+      c.style.stroke = `var(--${rv.color})`;
+    });
+  }
+
+  /* ---------- scénarios ---------- */
+
+  let active = "calme";
+  function applyScenario(key) {
+    active = key;
+    const scn = SCENARIOS[key];
+    document.getElementById("scn-note").innerHTML = scn.note;
+    document.querySelectorAll(".scenarios button").forEach(b =>
+      b.classList.toggle("active", b.dataset.scn === key));
+    RIVERS.forEach(rv => {
+      rv.tgt = rv.base * (scn.mult[rv.id] !== undefined ? scn.mult[rv.id] : 1);
+      rebuildParticles(rv);
+      if (reduced) { rv.cur = rv.tgt; }
+    });
+    renderTable();
+    if (reduced) { renderWidths(); RIVERS.forEach(drawChevrons); }
+  }
+
+  function renderWidths() {
+    RIVERS.forEach(rv => {
+      const w = widthOf(rv.cur) * Math.min(1, Math.abs(rv.cur) * 12 + 0.05);
+      rv.bed.setAttribute("stroke-width", (w * 1.7).toFixed(2));
+      rv.chan.setAttribute("stroke-width", w.toFixed(2));
+    });
+  }
+
+  function renderTable() {
+    const rows = RIVERS.map(rv => {
+      const f = rv.tgt, from = byId[rv.from].name, to = byId[rv.to].name;
+      const lbl = f < 0 ? `${to} → ${from} (inversé)` : `${from} → ${to}`;
+      return `<tr><td>${lbl}</td><td class="num">${fmtT(Math.abs(f))}</td></tr>`;
+    }).join("");
+    document.getElementById("flow-table").innerHTML =
+      `<thead><tr><th>Rivière — ${SCENARIOS[active].label}</th><th style="text-align:right">T$/an</th></tr></thead><tbody>${rows}</tbody>`;
+  }
+
+  document.querySelectorAll(".scenarios button").forEach(b =>
+    b.addEventListener("click", () => applyScenario(b.dataset.scn)));
+
+  /* ---------- boucle d'animation ---------- */
+
+  let last = performance.now();
+  function frame(now) {
+    const dt = Math.min(0.05, (now - last) / 1000);
+    last = now;
+    RIVERS.forEach(rv => {
+      rv.cur += (rv.tgt - rv.cur) * Math.min(1, dt * 2.4);
+      const dir = rv.cur < 0 ? -1 : 1;
+      const speedScale = Math.min(1, Math.abs(rv.cur) * 6 + 0.05);
+      rv.particles.forEach(p => {
+        p.s = (p.s + dir * p.v * speedScale * dt + rv.geom.len) % rv.geom.len;
+        const i = Math.min(rv.geom.pts.length - 1, Math.round(p.s / rv.geom.step));
+        const pt = rv.geom.pts[i], nrm = rv.geom.normals[i];
+        p.el.setAttribute("transform",
+          `translate(${(pt[0] + nrm[0] * p.lat).toFixed(1)},${(pt[1] + nrm[1] * p.lat).toFixed(1)})`);
+      });
+    });
+    renderWidths();
+    requestAnimationFrame(frame);
+  }
+
+  const hash = location.hash.replace("#", "");
+  applyScenario(SCENARIOS[hash] ? hash : "calme");
+  if (SCENARIOS[hash]) RIVERS.forEach(rv => { rv.cur = rv.tgt; });
+  renderWidths();
+  if (!reduced) requestAnimationFrame(frame);
+})();
+</script>

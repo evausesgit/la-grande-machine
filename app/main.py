@@ -91,6 +91,11 @@ def comprendre():
     return FileResponse(ROOT / "viz" / "index.html", media_type="text/html")
 
 
+@app.get("/rivieres")
+def rivieres():
+    return FileResponse(ROOT / "viz" / "rivieres-lacs.html", media_type="text/html")
+
+
 TYPES_GERANTS = {
     "conviction_13f": {"label": "Les fonds de conviction américains",
                        "blurb": "Portefeuilles courts et assumés, déclarés chaque trimestre à la SEC (13F, jusqu'à 45 jours de délai)."},
