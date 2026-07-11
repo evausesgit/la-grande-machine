@@ -58,8 +58,14 @@ class CollectorTests(unittest.TestCase):
     def test_collection_can_be_limited_to_pea_family(self, yahoo_fetch, fred_fetch, _sleep):
         report = collect_all(self.session, families={"pea"})
 
-        self.assertEqual(set(report), {"pea_sp500_psp5", "pea_world_wpea"})
-        self.assertEqual({call.args[0] for call in yahoo_fetch.call_args_list}, {"PSP5.PA", "WPEA.PA"})
+        self.assertEqual(
+            set(report),
+            {"pea_sp500_psp5", "pea_world_wpea", "pea_nasdaq_pust", "pea_europe_pceu"},
+        )
+        self.assertEqual(
+            {call.args[0] for call in yahoo_fetch.call_args_list},
+            {"PSP5.PA", "WPEA.PA", "PUST.PA", "PCEU.PA"},
+        )
         fred_fetch.assert_not_called()
 
 

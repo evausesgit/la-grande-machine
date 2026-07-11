@@ -14,7 +14,10 @@ class LabSettings:
 
 def _metrics(nav_points: list[dict]) -> dict:
     if len(nav_points) < 2:
-        return {"return_pct": 0.0, "cagr_pct": 0.0, "volatility_pct": 0.0, "max_drawdown_pct": 0.0}
+        return {
+            "return_pct": 0.0, "cagr_pct": 0.0, "volatility_pct": 0.0, "max_drawdown_pct": 0.0,
+            "sharpe_ratio": 0.0, "sortino_ratio": 0.0,
+        }
     values = [1.0, *[point["nav"] for point in nav_points]]
     daily_returns = [values[index] / values[index - 1] - 1 for index in range(1, len(values)) if values[index - 1]]
     elapsed_days = (nav_points[-1]["date"] - nav_points[0]["date"]).days
@@ -26,11 +29,23 @@ def _metrics(nav_points: list[dict]) -> dict:
     for value in values:
         peak = max(peak, value)
         max_drawdown = min(max_drawdown, value / peak - 1)
+
+    # Rendement annualisé et déviation à la baisse (cible 0, sans taux sans risque en v1)
+    annualized_return = statistics.fmean(daily_returns) * 252 if daily_returns else 0.0
+    downside_deviation = (
+        math.sqrt(sum(min(r, 0.0) ** 2 for r in daily_returns) / len(daily_returns)) * math.sqrt(252)
+        if daily_returns else 0.0
+    )
+    sharpe_ratio = annualized_return / volatility if volatility else 0.0
+    sortino_ratio = annualized_return / downside_deviation if downside_deviation else 0.0
+
     return {
         "return_pct": round((values[-1] / values[0] - 1) * 100, 2),
         "cagr_pct": round(cagr * 100, 2),
         "volatility_pct": round(volatility * 100, 2),
         "max_drawdown_pct": round(max_drawdown * 100, 2),
+        "sharpe_ratio": round(sharpe_ratio, 2),
+        "sortino_ratio": round(sortino_ratio, 2),
     }
 
 

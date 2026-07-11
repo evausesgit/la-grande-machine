@@ -107,5 +107,8 @@ footer { margin-top: 4rem; border-top: 1px solid var(--hairline); padding-top: 1
 .chart-trend { stroke: var(--ink-2); }
 .chart-legend { display: flex; gap: 22px; justify-content: center; color: var(--ink-2); font-size: 0.78rem; }
 .chart-legend span::before { content: ""; display: inline-block; width: 18px; margin: 0 6px 3px 0; border-top: 3px solid; }
+.pf.comparatif { font-size: 0.85rem; }
+.pf.comparatif th, .pf.comparatif td { padding: 6px 10px; }
+.comparatif-erreur td { color: var(--ink-3); font-style: italic; }
 .chart-legend .buy-hold::before { border-color: var(--brass); }
 .chart-legend .trend::before { border-color: var(--ink-2); }

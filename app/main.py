@@ -184,6 +184,31 @@ def laboratoire(
     })
 
 
+@app.get("/laboratoire/comparatif")
+def laboratoire_comparatif(
+    request: Request,
+    capital: float = 10_000,
+    versement: float = 200,
+    frais_bps: float = 10,
+    moyenne: int = 200,
+    session: Session = Depends(get_session),
+):
+    lignes = []
+    for code, produit in PEA_LAB_PRODUCTS.items():
+        settings = _lab_parameters(code, capital, versement, frais_bps, moyenne)
+        results, error = _run_lab(session, code, settings)
+        if error:
+            lignes.append({"code": code, "produit": produit, "erreur": error})
+            continue
+        for strategie, result in results.items():
+            lignes.append({"code": code, "produit": produit, "strategie": strategie, "resultat": result})
+    lignes.sort(key=lambda ligne: ligne.get("resultat", {}).get("sharpe_ratio", float("-inf")), reverse=True)
+    return templates.TemplateResponse(request, "laboratoire_comparatif.html", {
+        "lignes": lignes,
+        "settings": _lab_parameters("pea_sp500_psp5", capital, versement, frais_bps, moyenne),
+    })
+
+
 @app.get("/api/laboratoire")
 def api_laboratoire(
     produit: str = "pea_sp500_psp5",

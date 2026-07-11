@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Comparatif du laboratoire PEA — La Grande Machine</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="site"><a href="/">La Grande Machine — l'observatoire</a></div>
+  <h1>Comparatif <span class="amp">PEA</span></h1>
+  <p class="lede">Tous les supports du laboratoire, aux deux règles, sur les mêmes hypothèses (capital {{ settings.initial_capital | fmt_valeur(0) }} €, versement {{ settings.monthly_contribution | fmt_valeur(0) }} €/mois, frais {{ settings.fee_bps | fmt_valeur(0) }} pb, moyenne mobile {{ settings.moving_average_days }} séances). Classé par ratio de Sharpe décroissant.</p>
+</header>
+
+<section>
+  <table class="pf comparatif">
+    <thead>
+      <tr>
+        <th>Support</th>
+        <th>Règle</th>
+        <th class="num">Rendement annualisé</th>
+        <th class="num">Volatilité</th>
+        <th class="num">Sharpe</th>
+        <th class="num">Sortino</th>
+        <th class="num">Perte maximale</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for ligne in lignes %}
+      {% if ligne.erreur %}
+      <tr class="comparatif-erreur">
+        <td><a href="/laboratoire?produit={{ ligne.code }}">{{ ligne.produit.ticker }}</a> — {{ ligne.produit.label }}</td>
+        <td colspan="6">{{ ligne.erreur }}</td>
+      </tr>
+      {% else %}
+      <tr>
+        <td><a href="/laboratoire?produit={{ ligne.code }}">{{ ligne.produit.ticker }}</a> — {{ ligne.produit.label }}</td>
+        <td>{{ "Achat-conservation" if ligne.strategie == "buy_hold" else "Tendance" }}</td>
+        <td class="num">{{ ligne.resultat.cagr_pct | fmt_valeur(2) }} %</td>
+        <td class="num">{{ ligne.resultat.volatility_pct | fmt_valeur(2) }} %</td>
+        <td class="num">{{ ligne.resultat.sharpe_ratio | fmt_valeur(2) }}</td>
+        <td class="num">{{ ligne.resultat.sortino_ratio | fmt_valeur(2) }}</td>
+        <td class="num">{{ ligne.resultat.max_drawdown_pct | fmt_valeur(2) }} %</td>
+      </tr>
+      {% endif %}
+      {% endfor %}
+    </tbody>
+  </table>
+  <p class="hint">Sharpe et Sortino rapportent le rendement annualisé à la volatilité (Sharpe) ou à la seule volatilité des baisses (Sortino), taux sans risque supposé nul. La performance passée d'un support ou d'une règle ne garantit aucun résultat futur ; historiques de longueurs différentes selon le support, ce qui limite la comparaison brute.</p>
+</section>
+
+<footer>
+  <p><a href="/laboratoire">← Laboratoire</a> · <a href="/">Observatoire</a> · <a href="/fonds">Portefeuilles des gérants</a></p>
+  <p class="hint">Outil pédagogique, sans passage d'ordre. L'éligibilité peut évoluer : la vérifier auprès de votre courtier et dans le document réglementaire avant toute opération.</p>
+</footer>
+</div>
+</body>
+</html>

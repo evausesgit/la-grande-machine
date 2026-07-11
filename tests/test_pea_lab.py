@@ -1,4 +1,5 @@
 import datetime
+import math
 import unittest
 
 from app.engine.pea_lab import LabSettings, simulate_pea
@@ -66,6 +67,28 @@ class PeaLabTests(unittest.TestCase):
     def test_unknown_strategy_is_rejected(self):
         with self.assertRaisesRegex(ValueError, "stratégie inconnue"):
             simulate_pea(series([100, 101]), LabSettings(), "market_timing")
+
+    def test_noisy_rise_gives_positive_sharpe_and_sortino(self):
+        # tendance haussière avec des à-coups (sinusoïde) : il y a de vraies baisses,
+        # donc une déviation à la baisse non nulle, contrairement à une hausse parfaitement lisse
+        result = simulate_pea(
+            series([100 + index * 0.2 + 10 * math.sin(index / 10) for index in range(400)]),
+            LabSettings(initial_capital=10_000, monthly_contribution=0, fee_bps=0),
+            "buy_hold",
+        )
+        self.assertGreater(result["sharpe_ratio"], 0)
+        self.assertGreater(result["sortino_ratio"], 0)
+
+    def test_sortino_ignores_upside_volatility(self):
+        # baisses toujours du même ordre, hausses de plus en plus amples : le risque de
+        # baisse pèse moins que la volatilité totale, donc Sortino >= Sharpe
+        result = simulate_pea(
+            series([100, 100, 105, 100, 108, 100, 112, 100, 118] * 40),
+            LabSettings(initial_capital=10_000, monthly_contribution=0, fee_bps=0),
+            "buy_hold",
+        )
+        if result["sharpe_ratio"] > 0:
+            self.assertGreaterEqual(result["sortino_ratio"], result["sharpe_ratio"])
 
 
 if __name__ == "__main__":
