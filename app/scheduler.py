@@ -3,6 +3,7 @@
 Activée par RUN_SCHEDULER=1 (jamais en développement local par défaut)."""
 import logging
 import os
+from datetime import datetime, timedelta
 
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
@@ -19,6 +20,17 @@ def _collecte():
         report = collect_all(session)
     ok = sum(1 for r in report.values() if r["ok"])
     log.info("collecte planifiée : %s ok, %s échecs", ok, len(report) - ok)
+
+
+def _bootstrap_pea():
+    """Rend le laboratoire utilisable peu après un nouveau déploiement."""
+    from .collectors.run import collect_all
+    from .db import SessionLocal
+
+    with SessionLocal() as session:
+        report = collect_all(session, families={"pea"})
+    ok = sum(1 for result in report.values() if result["ok"])
+    log.info("initialisation PEA : %s ok, %s échecs", ok, len(report) - ok)
 
 
 def _collecte_fonds():
@@ -41,6 +53,7 @@ def start():
     _scheduler.add_job(_collecte, CronTrigger(hour=6, minute=15))
     # 13F : dépôts EDGAR possibles tous les jours ouvrés, vérification quotidienne
     _scheduler.add_job(_collecte_fonds, CronTrigger(hour=5, minute=45))
+    _scheduler.add_job(_bootstrap_pea, next_run_time=datetime.now() + timedelta(seconds=5))
     _scheduler.start()
     log.info("scheduler démarré (23h05, 06h15 et 05h45 pour les fonds, Europe/Paris)")
 

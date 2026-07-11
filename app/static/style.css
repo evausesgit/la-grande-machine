@@ -71,3 +71,41 @@ footer { margin-top: 4rem; border-top: 1px solid var(--hairline); padding-top: 1
 .pf .num { text-align: right; font-variant-numeric: tabular-nums; }
 .gerant .sub { font-size: 0.72rem; color: var(--ink-3); margin-top: 8px; }
 .a-venir { color: var(--ink-2); font-size: 0.88rem; font-style: italic; }
+
+/* /laboratoire — simulations PEA */
+.lab-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px;
+            background: var(--surface); border: 1px solid var(--hairline); border-radius: 12px; padding: 16px; }
+.lab-form label { color: var(--ink-2); font-size: 0.78rem; }
+.lab-form input, .lab-form select { display: block; width: 100%; margin-top: 4px; padding: 8px;
+                                    color: var(--ink); background: var(--paper); border: 1px solid var(--hairline); border-radius: 6px; }
+.lab-form button { align-self: end; padding: 9px 14px; border: 0; border-radius: 6px;
+                   background: var(--brass); color: white; font-weight: 700; cursor: pointer; }
+.product-card, .lab-warning, .lab-explain { margin-top: 14px; padding: 14px 16px; border: 1px solid var(--hairline);
+                                          border-radius: 10px; background: var(--surface); }
+.product-card { display: flex; flex-wrap: wrap; gap: 6px 18px; color: var(--ink-2); font-size: 0.85rem; }
+.lab-warning { border-color: var(--brass); background: var(--brass-soft); }
+.lab-results { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
+.metric-card { background: var(--surface); border: 1px solid var(--hairline); border-radius: 12px; padding: 16px 18px; }
+.metric-card h2 { margin: 0; font-family: Charter, Cambria, Georgia, serif; font-size: 1.15rem; }
+.big-number { margin-top: 8px; font-size: 2rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.metric-card dl { margin: 12px 0 0; }
+.metric-card dl div { display: flex; justify-content: space-between; gap: 12px; padding: 5px 0; border-top: 1px solid var(--hairline); }
+.metric-card dt { color: var(--ink-2); }
+.metric-card dd { margin: 0; font-weight: 650; font-variant-numeric: tabular-nums; }
+.signal { display: inline-block; margin: 2px 0 10px; padding: 4px 8px; border-radius: 999px;
+          font-size: 0.76rem; font-weight: 700; }
+.signal.active { color: var(--up); background: color-mix(in srgb, var(--up) 10%, transparent); }
+.signal.inactive { color: var(--ink-2); background: var(--hairline); }
+.lab-chart-card { margin-top: 14px; padding: 16px 18px; overflow: hidden; background: var(--surface);
+                  border: 1px solid var(--hairline); border-radius: 12px; }
+.lab-chart-card h2 { margin: 0; font-family: Charter, Cambria, Georgia, serif; font-size: 1.15rem; }
+.lab-chart { display: block; width: 100%; height: auto; margin-top: 8px; }
+.chart-grid { stroke: var(--hairline); stroke-width: 1; }
+.chart-label { fill: var(--ink-3); font-size: 11px; }
+.chart-buy-hold, .chart-trend { fill: none; stroke-width: 2.5; vector-effect: non-scaling-stroke; }
+.chart-buy-hold { stroke: var(--brass); }
+.chart-trend { stroke: var(--ink-2); }
+.chart-legend { display: flex; gap: 22px; justify-content: center; color: var(--ink-2); font-size: 0.78rem; }
+.chart-legend span::before { content: ""; display: inline-block; width: 18px; margin: 0 6px 3px 0; border-top: 3px solid; }
+.chart-legend .buy-hold::before { border-color: var(--brass); }
+.chart-legend .trend::before { border-color: var(--ink-2); }

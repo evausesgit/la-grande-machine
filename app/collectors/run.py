@@ -4,7 +4,7 @@ import datetime
 import logging
 import time
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from ..config import GERANTS, INSTRUMENTS
@@ -68,14 +68,26 @@ def _upsert_prices(session: Session, inst: Instrument, rows: list[tuple[datetime
     return added
 
 
-def collect_all(session: Session, deep: bool = False) -> dict:
-    """Collecte toutes les séries. deep=True : historique long (premier remplissage)."""
+def collect_all(session: Session, deep: bool = False, families: set[str] | None = None) -> dict:
+    """Collecte les séries demandées. deep=True force leur historique long."""
     seed_instruments(session)
     report = {}
     for inst in session.scalars(select(Instrument)):
+        if families is not None and inst.family not in families:
+            continue
         try:
             if inst.source == "yahoo":
-                rows = yahoo.fetch_history(inst.symbol, range_="5y" if deep else "1mo")
+                deep_range = "10y" if inst.family == "pea" else "5y"
+                point_count = session.scalar(
+                    select(func.count(PriceDaily.id)).where(PriceDaily.instrument_id == inst.id)
+                )
+                # Un nouveau support PEA doit être utilisable après la première
+                # collecte planifiée, sans attendre un an ni une action manuelle.
+                bootstrap_pea = inst.family == "pea" and (point_count or 0) < 252
+                rows = yahoo.fetch_history(
+                    inst.symbol,
+                    range_=deep_range if deep or bootstrap_pea else "1mo",
+                )
                 time.sleep(0.4)  # courtoisie : ~40 requêtes par collecte
             elif inst.source == "fred":
                 start = None if deep else datetime.date.today() - datetime.timedelta(days=40)

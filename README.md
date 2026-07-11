@@ -20,6 +20,7 @@ quels actifs, et surtout **pourquoi les prix montent ou descendent**.
   pédagogique (réservoirs, circuit de l'épargne, grands acteurs, croissance sur 25 ans,
   carte interactive des dépendances avec scénarios animés).
   Publiée : https://claude.ai/code/artifact/ef5328e4-54b0-4d79-b523-f53b2d361c21
+- `/laboratoire` — simulations exclusivement PEA : achat-conservation contre filtre de tendance, avec versements, parts entières et frais de courtage.
 
 ## Réalité des données (à garder en tête)
 

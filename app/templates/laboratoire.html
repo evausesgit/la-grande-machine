@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Laboratoire PEA — La Grande Machine</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="site"><a href="/">La Grande Machine — l'observatoire</a></div>
+  <h1>Laboratoire <span class="amp">PEA</span></h1>
+  <p class="lede">Comparer des règles sur des supports éligibles au PEA, sans passer d'ordre. Les simulations incluent les versements, les parts entières et les frais de courtage.</p>
+</header>
+
+<form class="lab-form" method="get">
+  <label>Support
+    <select name="produit">
+      {% for code, item in produits.items() %}
+      <option value="{{ code }}" {% if code == produit_id %}selected{% endif %}>{{ item.ticker }} — {{ item.label }}</option>
+      {% endfor %}
+    </select>
+  </label>
+  <label>Capital initial (€)<input type="number" name="capital" min="100" step="100" value="{{ settings.initial_capital | int }}"></label>
+  <label>Versement mensuel (€)<input type="number" name="versement" min="0" step="10" value="{{ settings.monthly_contribution | int }}"></label>
+  <label>Frais par ordre (points de base)<input type="number" name="frais_bps" min="0" max="500" step="1" value="{{ settings.fee_bps | int }}"></label>
+  <label>Moyenne mobile (séances)<input type="number" name="moyenne" min="20" max="500" value="{{ settings.moving_average_days }}"></label>
+  <button type="submit">Recalculer</button>
+</form>
+
+<section class="product-card">
+  <div><strong>{{ produit.ticker }}</strong> · {{ produit.isin }}</div>
+  <div>{{ produit.index }} · frais courants {{ "%.2f" | format(produit.ongoing_cost_pct) | replace(".", ",") }} % · lancé le {{ produit.inception }}</div>
+  <div>{{ produit.exposure }} · réplication {{ produit.replication | lower }}</div>
+  <a href="{{ produit.source_url }}">Documenter l'éligibilité chez l'émetteur</a>
+</section>
+
+{% if error %}
+<section class="lab-warning"><strong>Simulation indisponible.</strong> {{ error }}.</section>
+{% else %}
+<section>
+  <div class="eyebrow">Résultats</div>
+  <p class="hint">Du {{ results.buy_hold.start_date }} au {{ results.buy_hold.end_date }}. Même capital et mêmes versements pour les deux règles.</p>
+  <div class="lab-results">
+    {% for key, result in results.items() %}
+    <article class="metric-card">
+      <h2>{{ "Achat-conservation" if key == "buy_hold" else "Tendance" }}</h2>
+      <div class="big-number">{{ result.final_value | fmt_valeur(0) }} €</div>
+      <p class="hint">{{ result.contributed | fmt_valeur(0) }} € versés · gain {{ result.gain | fmt_valeur(0) }} €</p>
+      <p class="signal {{ 'active' if result.invested_now else 'inactive' }}">
+        Au {{ result.end_date }} : {{ "investi sur l’ETF" if result.invested_now else "en espèces dans le PEA" }}
+      </p>
+      <dl>
+        <div><dt>Performance cumulée*</dt><dd>{{ result.return_pct | fmt_valeur(2) }} %</dd></div>
+        <div><dt>Rendement annualisé</dt><dd>{{ result.cagr_pct | fmt_valeur(2) }} %</dd></div>
+        <div><dt>Perte maximale</dt><dd>{{ result.max_drawdown_pct | fmt_valeur(2) }} %</dd></div>
+        <div><dt>Volatilité</dt><dd>{{ result.volatility_pct | fmt_valeur(2) }} %</dd></div>
+        <div><dt>Frais simulés</dt><dd>{{ result.fees_paid | fmt_valeur(2) }} €</dd></div>
+        <div><dt>Transactions</dt><dd>{{ result.transactions }}</dd></div>
+      </dl>
+    </article>
+    {% endfor %}
+  </div>
+  <div class="lab-chart-card">
+    <h2>Évolution de 1 € investi</h2>
+    <p class="hint">Valeur de part, neutralisée des versements. Base 1 au début de la période.</p>
+    <svg id="lab-chart" class="lab-chart" viewBox="0 0 900 320" role="img" aria-label="Comparaison de la valeur de part des deux stratégies"></svg>
+    <div class="chart-legend"><span class="buy-hold">Achat-conservation</span><span class="trend">Tendance</span></div>
+  </div>
+</section>
+<section class="lab-explain">
+  <div class="eyebrow">Ce que l'on teste</div>
+  <p><strong>Achat-conservation</strong> investit chaque versement dès que possible. <strong>Tendance</strong> investit lorsque la clôture précédente dépasse sa moyenne mobile, sinon conserve les espèces dans le PEA. Le signal utilise uniquement les informations déjà disponibles.</p>
+  <p class="hint">* La performance est celle d'une valeur de part interne : les nouveaux versements augmentent le capital, mais pas artificiellement le rendement. Les cours historiques intègrent déjà les frais courants de l'ETF. La simulation ignore fiscalité, spread, rémunération des espèces et écart de suivi.</p>
+</section>
+<script>
+(() => {
+  const series = {{ {
+    "buy_hold": results.buy_hold.points,
+    "trend": results.trend.points
+  } | tojson }};
+  const svg = document.getElementById("lab-chart");
+  const width = 900, height = 320, left = 52, right = 14, top = 14, bottom = 34;
+  const all = [...series.buy_hold, ...series.trend];
+  const min = Math.min(...all.map(point => point.nav));
+  const max = Math.max(...all.map(point => point.nav));
+  const span = Math.max(max - min, 0.01);
+  const x = index => left + index / (series.buy_hold.length - 1) * (width - left - right);
+  const y = value => top + (max - value) / span * (height - top - bottom);
+  const ns = "http://www.w3.org/2000/svg";
+  const node = (name, attrs, text) => {
+    const element = document.createElementNS(ns, name);
+    Object.entries(attrs).forEach(([key, value]) => element.setAttribute(key, value));
+    if (text) element.textContent = text;
+    svg.appendChild(element);
+    return element;
+  };
+  for (let tick = 0; tick <= 4; tick += 1) {
+    const value = min + span * tick / 4;
+    const position = y(value);
+    node("line", {x1: left, x2: width - right, y1: position, y2: position, class: "chart-grid"});
+    node("text", {x: left - 8, y: position + 4, class: "chart-label", "text-anchor": "end"}, value.toFixed(2));
+  }
+  [["buy_hold", "chart-buy-hold"], ["trend", "chart-trend"]].forEach(([key, className]) => {
+    const points = series[key].map((point, index) => `${x(index).toFixed(1)},${y(point.nav).toFixed(1)}`).join(" ");
+    node("polyline", {points, class: className});
+  });
+  node("text", {x: left, y: height - 8, class: "chart-label"}, series.buy_hold[0].date);
+  node("text", {x: width - right, y: height - 8, class: "chart-label", "text-anchor": "end"}, series.buy_hold.at(-1).date);
+})();
+</script>
+{% endif %}
+
+<footer>
+  <p><a href="/">← Observatoire</a> · <a href="/fonds">Portefeuilles des gérants</a></p>
+  <p class="hint">Outil pédagogique, sans passage d'ordre. L'éligibilité peut évoluer : la vérifier auprès de votre courtier et dans le document réglementaire avant toute opération. Rendements passés et simulations ne garantissent aucun résultat futur.</p>
+</footer>
+</div>
+</body>
+</html>

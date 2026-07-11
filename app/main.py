@@ -14,9 +14,10 @@ from sqlalchemy.orm import Session
 from . import scheduler
 from .collectors.edgar13f import collect_13f
 from .collectors.run import collect_all, seed_gerants, seed_instruments
-from .config import FAMILIES
+from .config import FAMILIES, PEA_LAB_PRODUCTS
 from .db import Base, SessionLocal, engine
 from .engine.moves import compute_moves
+from .engine.pea_lab import LabSettings, simulate_pea
 from .models import AssetManager, Brief, Fund, FundSnapshot, Instrument, Position, PriceDaily
 
 logging.basicConfig(level=logging.INFO)
@@ -126,6 +127,77 @@ def fonds(request: Request, session: Session = Depends(get_session)):
         "types": TYPES_GERANTS,
         "par_type": par_type,
     })
+
+
+def _lab_parameters(produit: str, capital: float, versement: float, frais_bps: float, moyenne: int):
+    if produit not in PEA_LAB_PRODUCTS:
+        raise HTTPException(status_code=404, detail="produit PEA inconnu")
+    try:
+        settings = LabSettings(
+            initial_capital=min(max(float(capital), 100), 1_000_000),
+            monthly_contribution=min(max(float(versement), 0), 50_000),
+            fee_bps=min(max(float(frais_bps), 0), 500),
+            moving_average_days=min(max(int(moyenne), 20), 500),
+        )
+    except (TypeError, ValueError) as exc:
+        raise HTTPException(status_code=422, detail=f"paramètres invalides : {exc}")
+    return settings
+
+
+def _run_lab(session: Session, produit: str, settings: LabSettings):
+    instrument = session.scalars(select(Instrument).where(Instrument.code == produit)).first()
+    if instrument is None:
+        return None, "produit absent de la base : redémarrer l'application pour initialiser le catalogue"
+    prices = session.execute(
+        select(PriceDaily.date, PriceDaily.close)
+        .where(PriceDaily.instrument_id == instrument.id)
+        .order_by(PriceDaily.date)
+    ).all()
+    minimum = max(settings.moving_average_days + 30, 252)
+    if len(prices) < minimum:
+        return None, f"historique insuffisant ({len(prices)} points, {minimum} requis) : lancer une collecte profonde"
+    return {
+        "buy_hold": simulate_pea(prices, settings, "buy_hold"),
+        "trend": simulate_pea(prices, settings, "trend"),
+    }, None
+
+
+@app.get("/laboratoire")
+def laboratoire(
+    request: Request,
+    produit: str = "pea_sp500_psp5",
+    capital: float = 10_000,
+    versement: float = 200,
+    frais_bps: float = 10,
+    moyenne: int = 200,
+    session: Session = Depends(get_session),
+):
+    settings = _lab_parameters(produit, capital, versement, frais_bps, moyenne)
+    results, error = _run_lab(session, produit, settings)
+    return templates.TemplateResponse(request, "laboratoire.html", {
+        "produits": PEA_LAB_PRODUCTS,
+        "produit_id": produit,
+        "produit": PEA_LAB_PRODUCTS[produit],
+        "settings": settings,
+        "results": results,
+        "error": error,
+    })
+
+
+@app.get("/api/laboratoire")
+def api_laboratoire(
+    produit: str = "pea_sp500_psp5",
+    capital: float = 10_000,
+    versement: float = 200,
+    frais_bps: float = 10,
+    moyenne: int = 200,
+    session: Session = Depends(get_session),
+):
+    settings = _lab_parameters(produit, capital, versement, frais_bps, moyenne)
+    results, error = _run_lab(session, produit, settings)
+    if error:
+        raise HTTPException(status_code=409, detail=error)
+    return {"produit": PEA_LAB_PRODUCTS[produit], "parametres": settings.__dict__, "resultats": results}
 
 
 @app.get("/api/journee")

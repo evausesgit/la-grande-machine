@@ -3,6 +3,9 @@
 # family: indices | actions | taux | credit | devises | matieres | crypto | volatilite
 # source: yahoo | fred
 INSTRUMENTS = [
+    # --- Laboratoire PEA ---
+    {"code": "pea_sp500_psp5", "name": "Amundi PEA S&P 500 UCITS ETF Acc", "family": "pea", "source": "yahoo", "symbol": "PSP5.PA", "unit": "€", "decimals": 2},
+    {"code": "pea_world_wpea", "name": "iShares MSCI World Swap PEA UCITS ETF", "family": "pea", "source": "yahoo", "symbol": "WPEA.PA", "unit": "€", "decimals": 2},
     # --- Indices actions ---
     {"code": "sp500",    "name": "S&P 500 (États-Unis)",        "family": "indices", "source": "yahoo", "symbol": "^GSPC",     "unit": "pts",  "decimals": 0},
     {"code": "nasdaq",   "name": "Nasdaq Composite",             "family": "indices", "source": "yahoo", "symbol": "^IXIC",     "unit": "pts",  "decimals": 0},
@@ -129,6 +132,7 @@ GERANTS = [
 TOP_N_13F = {"geant_13f": 50, "conviction_13f": 200}
 
 FAMILIES = {
+    "pea":        {"label": "Laboratoire PEA",     "blurb": "Supports vérifiés comme éligibles au PEA, étudiés sans passage d'ordre."},
     "indices":    {"label": "Indices actions",      "blurb": "La météo des Bourses mondiales."},
     "actions":    {"label": "Actions phares",       "blurb": "Quelques champions pour incarner les mouvements."},
     "taux":       {"label": "Taux d'intérêt",       "blurb": "Le prix du temps — le marché le plus puissant du monde."},
@@ -137,4 +141,29 @@ FAMILIES = {
     "matieres":   {"label": "Matières premières",   "blurb": "L'économie physique : énergie, métaux, céréales."},
     "crypto":     {"label": "Crypto",               "blurb": "Jeune, petit, très sensible à la liquidité."},
     "volatilite": {"label": "Peur & volatilité",    "blurb": "Les sismographes de la machine."},
+}
+
+PEA_LAB_PRODUCTS = {
+    "pea_sp500_psp5": {
+        "label": "Amundi PEA S&P 500 UCITS ETF Acc",
+        "ticker": "PSP5",
+        "isin": "FR0011871128",
+        "index": "S&P 500 Net Total Return",
+        "ongoing_cost_pct": 0.12,
+        "inception": "2014-05-20",
+        "exposure": "500 grandes entreprises américaines",
+        "replication": "Synthétique",
+        "source_url": "https://www.amundietf.fr/fr/professionnels/produits/equity/amundi-pea-sp-500-ucits-etf-acc/fr0011871128",
+    },
+    "pea_world_wpea": {
+        "label": "iShares MSCI World Swap PEA UCITS ETF",
+        "ticker": "WPEA",
+        "isin": "IE0002XZSHO1",
+        "index": "MSCI World Net Total Return",
+        "ongoing_cost_pct": 0.20,
+        "inception": "2024-03-26",
+        "exposure": "Grandes et moyennes entreprises des marchés développés",
+        "replication": "Synthétique",
+        "source_url": "https://www.blackrock.com/fr/particuliers/products/335178/ishares-msci-world-swap-pea-ucits-etf",
+    },
 }
