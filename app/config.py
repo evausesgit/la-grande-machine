@@ -6,6 +6,8 @@ INSTRUMENTS = [
     # --- Laboratoire PEA ---
     {"code": "pea_sp500_psp5", "name": "Amundi PEA S&P 500 UCITS ETF Acc", "family": "pea", "source": "yahoo", "symbol": "PSP5.PA", "unit": "€", "decimals": 2},
     {"code": "pea_world_wpea", "name": "iShares MSCI World Swap PEA UCITS ETF", "family": "pea", "source": "yahoo", "symbol": "WPEA.PA", "unit": "€", "decimals": 2},
+    {"code": "pea_nasdaq_pust", "name": "Amundi PEA Nasdaq-100 UCITS ETF Acc", "family": "pea", "source": "yahoo", "symbol": "PUST.PA", "unit": "€", "decimals": 2},
+    {"code": "pea_europe_pceu", "name": "Amundi PEA MSCI Europe UCITS ETF Acc", "family": "pea", "source": "yahoo", "symbol": "PCEU.PA", "unit": "€", "decimals": 2},
     # --- Indices actions ---
     {"code": "sp500",    "name": "S&P 500 (États-Unis)",        "family": "indices", "source": "yahoo", "symbol": "^GSPC",     "unit": "pts",  "decimals": 0},
     {"code": "nasdaq",   "name": "Nasdaq Composite",             "family": "indices", "source": "yahoo", "symbol": "^IXIC",     "unit": "pts",  "decimals": 0},
@@ -165,5 +167,27 @@ PEA_LAB_PRODUCTS = {
         "exposure": "Grandes et moyennes entreprises des marchés développés",
         "replication": "Synthétique",
         "source_url": "https://www.blackrock.com/fr/particuliers/products/335178/ishares-msci-world-swap-pea-ucits-etf",
+    },
+    "pea_nasdaq_pust": {
+        "label": "Amundi PEA Nasdaq-100 UCITS ETF Acc",
+        "ticker": "PUST",
+        "isin": "FR0011871110",
+        "index": "Nasdaq-100",
+        "ongoing_cost_pct": 0.30,
+        "inception": "2014-05-20",
+        "exposure": "100 grandes entreprises non financières cotées au Nasdaq (tech US concentrée)",
+        "replication": "Synthétique",
+        "source_url": "https://www.amundietf.fr/fr/professionnels/produits/equity/amundi-pea-nasdaq100-ucits-etf-acc/fr0011871110",
+    },
+    "pea_europe_pceu": {
+        "label": "Amundi PEA MSCI Europe UCITS ETF Acc",
+        "ticker": "PCEU",
+        "isin": "FR0013412038",
+        "index": "MSCI Europe Net Total Return",
+        "ongoing_cost_pct": 0.15,
+        "inception": "2019-04-25",
+        "exposure": "Grandes et moyennes entreprises des marchés développés européens",
+        "replication": "Synthétique",
+        "source_url": "https://www.amundietf.fr/fr/particuliers/produits/equity/amundi-pea-msci-europe-ucits-etf-eur-cd/fr0013412038",
     },
 }

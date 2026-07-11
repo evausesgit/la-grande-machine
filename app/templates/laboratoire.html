@@ -12,6 +12,7 @@
   <div class="site"><a href="/">La Grande Machine — l'observatoire</a></div>
   <h1>Laboratoire <span class="amp">PEA</span></h1>
   <p class="lede">Comparer des règles sur des supports éligibles au PEA, sans passer d'ordre. Les simulations incluent les versements, les parts entières et les frais de courtage.</p>
+  <p class="hint"><a href="/laboratoire/comparatif">→ Vue comparative de tous les supports</a></p>
 </header>
 
 <form class="lab-form" method="get">
@@ -56,6 +57,8 @@
         <div><dt>Rendement annualisé</dt><dd>{{ result.cagr_pct | fmt_valeur(2) }} %</dd></div>
         <div><dt>Perte maximale</dt><dd>{{ result.max_drawdown_pct | fmt_valeur(2) }} %</dd></div>
         <div><dt>Volatilité</dt><dd>{{ result.volatility_pct | fmt_valeur(2) }} %</dd></div>
+        <div><dt>Ratio de Sharpe**</dt><dd>{{ result.sharpe_ratio | fmt_valeur(2) }}</dd></div>
+        <div><dt>Ratio de Sortino**</dt><dd>{{ result.sortino_ratio | fmt_valeur(2) }}</dd></div>
         <div><dt>Frais simulés</dt><dd>{{ result.fees_paid | fmt_valeur(2) }} €</dd></div>
         <div><dt>Transactions</dt><dd>{{ result.transactions }}</dd></div>
       </dl>
@@ -73,6 +76,7 @@
   <div class="eyebrow">Ce que l'on teste</div>
   <p><strong>Achat-conservation</strong> investit chaque versement dès que possible. <strong>Tendance</strong> investit lorsque la clôture précédente dépasse sa moyenne mobile, sinon conserve les espèces dans le PEA. Le signal utilise uniquement les informations déjà disponibles.</p>
   <p class="hint">* La performance est celle d'une valeur de part interne : les nouveaux versements augmentent le capital, mais pas artificiellement le rendement. Les cours historiques intègrent déjà les frais courants de l'ETF. La simulation ignore fiscalité, spread, rémunération des espèces et écart de suivi.</p>
+  <p class="hint">** Sharpe et Sortino rapportent le rendement annualisé à la volatilité (Sharpe) ou à la seule volatilité des baisses (Sortino), taux sans risque supposé nul. Plus haut est meilleur ; ils permettent de comparer des supports sans se laisser impressionner par un rendement brut plus élevé mais plus risqué.</p>
 </section>
 <script>
 (() => {
