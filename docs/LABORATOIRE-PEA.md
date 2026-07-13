@@ -2,14 +2,19 @@
 
 Le laboratoire compare des règles d'investissement sur des supports explicitement éligibles au PEA, sans transmettre d'ordre. Les 13F restent utiles pour comprendre les convictions américaines, mais leurs actions US ne sont pas achetées directement dans le PEA.
 
-## Univers initial
+## Univers
 
 | Code | Support | ISIN | Rôle |
 |---|---|---|---|
 | `pea_sp500_psp5` | Amundi PEA S&P 500 UCITS ETF Acc | `FR0011871128` | historique long pour éprouver le moteur |
 | `pea_world_wpea` | iShares MSCI World Swap PEA UCITS ETF | `IE0002XZSHO1` | cœur mondial diversifié, historique depuis 2024 |
+| `pea_eurostoxx50_euea` | iShares Core EURO STOXX 50 UCITS ETF EUR (Dist) | `IE0008471009` | zone euro, réplication physique, historique depuis 2000 |
+| `pea_cac40_cac` | Amundi CAC 40 UCITS ETF Dist (ex-Lyxor) | `FR0007052782` | France, réplication physique, historique depuis 2000 |
+| `pea_world_dcam` | Amundi PEA Monde (MSCI World) UCITS ETF Acc | `FR001400U5Q4` | cœur mondial éligible PEA par swap, alternative à `pea_world_wpea`, historique depuis mars 2025 |
 
-L'éligibilité n'est jamais déduite du nom : elle est documentée par le producteur et doit être revérifiée auprès du courtier avant une opération réelle.
+Ajout du 13 juillet 2026 : ces trois derniers supports ont été identifiés en comparant un relevé de courtage tiers (5 ETF hors PEA, détenus dans un compte britannique). Sur les 5, seuls deux étaient directement éligibles PEA (EURO STOXX 50 et CAC 40) ; les trois autres (MSCI World LU1781541179, S&P 500 Info Tech IE00B3WJKG14, Vanguard S&P 500 IE00BFMXXD54) ne le sont pas. Pour l'exposition MSCI World, `pea_world_dcam` est le substitut PEA-éligible réel (ISIN différent, structuré par swap chez Amundi) — pas le fonds détenu dans le relevé d'origine. Aucune donnée du relevé source (identité, montants, historique de transactions) n'a été reprise : seuls les caractéristiques publiques des instruments sont documentées ici.
+
+L'éligibilité n'est jamais déduite du nom : elle est documentée par le producteur et doit être revérifiée auprès du courtier avant une opération réelle. Note technique : les fiches producteur (blackrock.com, amundietf.fr) bloquent la récupération automatisée (403) — les caractéristiques ci-dessus sont corroborées par plusieurs agrégateurs indépendants (justetf.com, sicavonline.fr) mais le lien de chaque support pointe vers la fiche officielle, à consulter directement avant toute décision.
 
 ## Stratégies
 
