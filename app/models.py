@@ -1,6 +1,6 @@
 import datetime
 
-from sqlalchemy import Date, DateTime, Float, ForeignKey, Integer, JSON, String, Text, UniqueConstraint
+from sqlalchemy import Date, DateTime, Float, ForeignKey, Integer, JSON, LargeBinary, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .db import Base
@@ -78,6 +78,8 @@ class SourceDocument(Base):
     fetched_at: Mapped[datetime.datetime] = mapped_column(DateTime, default=datetime.datetime.utcnow)
     # en_attente | extrait | erreur — les 13F arrivent déjà structurés : « extrait »
     statut_extraction: Mapped[str] = mapped_column(String(16), default="en_attente")
+    # copie archivée du PDF (les URL des boutiques ne sont pas toutes pérennes) — nullable pour les 13F
+    contenu: Mapped[bytes | None] = mapped_column(LargeBinary, nullable=True)
 
 
 class FundSnapshot(Base):
