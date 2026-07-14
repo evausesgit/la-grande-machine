@@ -27,6 +27,8 @@ h1 { font-family: Charter, "Bitstream Charter", Cambria, Georgia, serif;
      font-size: clamp(1.9rem, 4.5vw, 2.8rem); margin: 0.4rem 0 0.6rem; text-wrap: balance; }
 h1 .amp { color: var(--brass); }
 .lede { color: var(--ink-2); max-width: 62ch; }
+.toplinks { margin-top: 0.9rem; padding-top: 0.7rem; border-top: 1px solid var(--hairline);
+            font-size: 0.85rem; color: var(--ink-2); }
 
 .eyebrow { letter-spacing: 0.14em; text-transform: uppercase; font-size: 0.72rem;
            font-weight: 600; color: var(--brass); margin: 2.6rem 0 0.3rem; }
