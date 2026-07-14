@@ -110,9 +110,9 @@ GERANTS = [
     {"slug": "amiral-gestion", "nom": "Amiral Gestion", "pays": "France", "type": "boutique",
      "site_web": "https://www.amiralgestion.com",
      "blurb": "Value, petites capitalisations, lettres de gestion détaillées.",
-     "fonds": [{"slug": "sextant-pme", "nom": "Sextant PME",
+     "fonds": [{"slug": "sextant-pme", "nom": "Sextant PME", "isin": "FR0011171412",
                 "strategie": "PME européennes", "note_source": "Page publication stable par fonds/part"},
-               {"slug": "sextant-grand-large", "nom": "Sextant Grand Large",
+               {"slug": "sextant-grand-large", "nom": "Sextant Grand Large", "isin": "FR0010286013",
                 "strategie": "Flexible international", "note_source": "Page publication stable par fonds/part"}]},
     {"slug": "carmignac", "nom": "Carmignac", "pays": "France", "type": "boutique",
      "site_web": "https://www.carmignac.fr",
@@ -122,13 +122,13 @@ GERANTS = [
     {"slug": "lfde", "nom": "La Financière de l'Échiquier", "pays": "France", "type": "boutique",
      "site_web": "https://www.lfde.com",
      "blurb": "Maison historique du stock-picking français.",
-     "fonds": [{"slug": "echiquier-agressor", "nom": "Echiquier Agressor",
+     "fonds": [{"slug": "echiquier-agressor", "nom": "Echiquier Agressor", "isin": "FR0010321802",
                 "strategie": "Actions européennes opportunistes", "note_source": "Factsheet cdn.lfde.com à URL stable écrasée chaque mois — archivage obligatoire"}]},
     {"slug": "comgest", "nom": "Comgest", "pays": "France", "type": "boutique",
      "site_web": "https://www.comgest.com",
      "blurb": "Qualité/croissance, discipline célèbre, horizon long.",
      "fonds": [{"slug": "comgest-growth-europe", "nom": "Comgest Growth Europe", "isin": "IE0004766675",
-                "strategie": "Actions européennes qualité/croissance", "note_source": "Monthly report derrière porte de profil investisseur"}]},
+                "strategie": "Actions européennes qualité/croissance", "note_source": "Monthly + Quarterly Report, page fonds publique (pas de porte constatée en F3)"}]},
 ]
 
 # Combien de lignes on conserve par snapshot 13F
