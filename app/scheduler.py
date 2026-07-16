@@ -1,5 +1,6 @@
 """Collecte planifiée (dans le container) :
-23h05 Paris — clôtures américaines ; 06h15 Paris — Asie + fraîcheur pour le brief.
+23h05 Paris — clôtures américaines ; 06h15 Paris — Asie + fraîcheur pour le brief ;
+06h45 Paris — rédaction et publication du brief du matin (recherche web incluse).
 Activée par RUN_SCHEDULER=1 (jamais en développement local par défaut)."""
 import logging
 import os
@@ -43,6 +44,21 @@ def _collecte_fonds():
     log.info("collecte 13F planifiée : %s ok, %s échecs", ok, len(report) - ok)
 
 
+def _brief_du_matin():
+    from .brief_writer import generer_et_publier
+    from .db import SessionLocal
+
+    if not os.environ.get("ANTHROPIC_API_KEY"):
+        log.warning("brief du matin sauté : ANTHROPIC_API_KEY absente")
+        return
+    with SessionLocal() as session:
+        try:
+            result = generer_et_publier(session)
+            log.info("brief du matin publié : %s", result)
+        except Exception:
+            log.exception("échec de la rédaction du brief du matin")
+
+
 def start():
     global _scheduler
     if os.environ.get("RUN_SCHEDULER") != "1":
@@ -53,9 +69,10 @@ def start():
     _scheduler.add_job(_collecte, CronTrigger(hour=6, minute=15))
     # 13F : dépôts EDGAR possibles tous les jours ouvrés, vérification quotidienne
     _scheduler.add_job(_collecte_fonds, CronTrigger(hour=5, minute=45))
+    _scheduler.add_job(_brief_du_matin, CronTrigger(hour=6, minute=45))
     _scheduler.add_job(_bootstrap_pea, next_run_time=datetime.now() + timedelta(seconds=5))
     _scheduler.start()
-    log.info("scheduler démarré (23h05, 06h15 et 05h45 pour les fonds, Europe/Paris)")
+    log.info("scheduler démarré (23h05, 06h15, 05h45 fonds et 06h45 brief, Europe/Paris)")
 
 
 def stop():

@@ -1,6 +1,7 @@
 # Déployé par Coolify — définir dans l'interface :
-#   DB_PASSWORD  (mot de passe PostgreSQL)
-#   ADMIN_TOKEN  (jeton des routes POST /api/collecte et /api/brief)
+#   DB_PASSWORD        (mot de passe PostgreSQL)
+#   ADMIN_TOKEN        (jeton des routes POST /api/collecte, /api/brief, /api/brief/generer)
+#   ANTHROPIC_API_KEY  (rédaction du brief du matin, recherche web incluse)
 services:
   app:
     build: .
@@ -8,6 +9,7 @@ services:
       DATABASE_URL: postgresql+psycopg2://machine:${DB_PASSWORD}@db:5432/machine
       RUN_SCHEDULER: "1"
       ADMIN_TOKEN: ${ADMIN_TOKEN}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
     expose:
       - "8000"
     depends_on:
