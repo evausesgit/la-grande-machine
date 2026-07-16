@@ -16,6 +16,22 @@ Ajout du 13 juillet 2026 : ces trois derniers supports ont été identifiés en 
 
 L'éligibilité n'est jamais déduite du nom : elle est documentée par le producteur et doit être revérifiée auprès du courtier avant une opération réelle. Note technique : les fiches producteur (blackrock.com, amundietf.fr) bloquent la récupération automatisée (403) — les caractéristiques ci-dessus sont corroborées par plusieurs agrégateurs indépendants (justetf.com, sicavonline.fr) mais le lien de chaque support pointe vers la fiche officielle, à consulter directement avant toute décision.
 
+Correction du 16 juillet 2026 : le collecteur Yahoo utilisait la clôture brute plutôt que la
+clôture ajustée des dividendes, ce qui sous-estimait le rendement réel des ETF distribuants
+(-13% sur 5 ans mesuré sur EUEA). `app/collectors/yahoo.py` utilise désormais `adjclose` quand
+Yahoo le fournit, avec repli sur la clôture brute sinon.
+
+## Mon portefeuille
+
+Stratégie réelle décidée le 16 juillet 2026, suivie sur `/portefeuille` (pas une exploration —
+une décision) : lump sum 2000€ S&P 500 + 1000€ MSCI World (WPEA) + 1000€ EURO STOXX 50 dans le
+PEA, puis versements mensuels 100€ / 50€ / 50€. Un investissement complémentaire de 1000€ en or
+(ETC physique) est prévu hors PEA sur compte-titres ordinaire (non éligible PEA, non simulé par
+cet outil). La configuration vit dans `MON_PORTEFEUILLE` (`app/config.py`) ; le champ `depuis` de
+chaque ligne est `None` tant que l'ordre n'est pas passé (affichage de l'historique complet du
+support) et doit être renseigné à la date réelle d'achat une fois les ordres exécutés, pour que
+le suivi reflète la performance réelle plutôt que l'historique du fonds depuis son lancement.
+
 ## Stratégies
 
 - **Achat-conservation** : chaque versement achète le maximum de parts entières.
