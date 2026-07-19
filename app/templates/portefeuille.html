@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mon portefeuille — La Grande Machine</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="site"><a href="/">La Grande Machine — l'observatoire</a></div>
+  <h1>Mon <span class="amp">portefeuille</span></h1>
+  <p class="lede">Stratégie décidée le {{ decide_le }} : achat-conservation, versements mensuels programmés.
+  Ceci suit une décision réelle, pas une exploration — voir <a href="/laboratoire">le Laboratoire</a> pour comparer des règles.</p>
+</header>
+
+{% if total %}
+<section class="product-card">
+  <div><strong>Total PEA (3 lignes)</strong></div>
+  <div>{{ total.valeur | fmt_valeur(0) }} € · {{ total.contribue | fmt_valeur(0) }} € versés · gain {{ total.gain | fmt_valeur(0) }} €</div>
+</section>
+{% endif %}
+
+<section>
+  <div class="eyebrow">Lignes du PEA</div>
+  <div class="lab-results">
+    {% for ligne in lignes %}
+    <article class="metric-card">
+      <h2>{{ ligne.produit.ticker }} — {{ ligne.produit.label }}</h2>
+      {% if ligne.resultat %}
+      <div class="big-number">{{ ligne.resultat.final_value | fmt_valeur(0) }} €</div>
+      <p class="hint">{{ ligne.capital | fmt_valeur(0) }} € au départ + {{ ligne.versement | fmt_valeur(0) }} €/mois ·
+        {{ ligne.resultat.contributed | fmt_valeur(0) }} € versés · gain {{ ligne.resultat.gain | fmt_valeur(0) }} €</p>
+      <dl>
+        <div><dt>Depuis</dt><dd>{{ ligne.resultat.start_date }}</dd></div>
+        <div><dt>Rendement cumulé</dt><dd>{{ ligne.resultat.return_pct | fmt_valeur(2) }} %</dd></div>
+        <div><dt>Rendement annualisé</dt><dd>{{ ligne.resultat.cagr_pct | fmt_valeur(2) }} %</dd></div>
+        <div><dt>Perte maximale traversée</dt><dd>{{ ligne.resultat.max_drawdown_pct | fmt_valeur(2) }} %</dd></div>
+      </dl>
+      <p class="hint"><a href="/laboratoire?produit={{ ligne.produit_id }}&capital={{ ligne.capital | int }}&versement={{ ligne.versement | int }}">Détail et comparaison avec la stratégie tendance →</a></p>
+      {% else %}
+      <p class="hint">{{ ligne.erreur }}</p>
+      {% endif %}
+    </article>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="lab-explain">
+  <div class="eyebrow">Hors PEA</div>
+  {% for item in hors_pea %}
+  <p><strong>{{ item.label }}</strong> · {{ item.capital | fmt_valeur(0) }} € · {{ item.note }}</p>
+  {% endfor %}
+</section>
+
+<section class="lab-explain">
+  <div class="eyebrow">Comment lire ces chiffres</div>
+  <p class="hint">Tant qu'aucune date d'achat réelle n'est renseignée, chaque ligne affiche l'historique complet
+  disponible pour ce support (pas seulement depuis la décision du {{ decide_le }}) — les trois lignes n'ont donc
+  pas la même profondeur d'historique et ne doivent pas être comparées entre elles telles quelles. Une fois les
+  ordres exécutés, le suivi sera recalé sur la date réelle d'achat.</p>
+</section>
+
+<footer>
+  <p><a href="/">← Observatoire</a> · <a href="/laboratoire">Laboratoire PEA</a> · <a href="/fonds">Portefeuilles des gérants</a></p>
+  <p class="hint">Outil pédagogique — ceci n'est pas un conseil d'investissement. Rendements passés et simulations ne garantissent aucun résultat futur.</p>
+</footer>
+</div>
+</body>
+</html>

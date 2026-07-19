@@ -146,6 +146,26 @@ FAMILIES = {
     "volatilite": {"label": "Peur & volatilité",    "blurb": "Les sismographes de la machine."},
 }
 
+# La stratégie réelle décidée avec l'utilisatrice — suivie sur /portefeuille.
+# "depuis" : None tant que l'achat n'est pas passé (on affiche l'historique complet
+# du support) ; une fois l'ordre exécuté, renseigner la date réelle (YYYY-MM-DD) pour
+# que le suivi ne parte que de l'entrée effective, pas de l'historique du fonds.
+MON_PORTEFEUILLE = {
+    "decide_le": "2026-07-16",
+    "lignes": [
+        {"produit": "pea_sp500_psp5", "capital": 2000, "versement": 100, "depuis": None},
+        {"produit": "pea_world_wpea", "capital": 1000, "versement": 50, "depuis": None},
+        {"produit": "pea_eurostoxx50_euea", "capital": 1000, "versement": 50, "depuis": None},
+    ],
+    "hors_pea": [
+        {
+            "label": "Or (ETC physique)",
+            "capital": 1000,
+            "note": "Non éligible PEA — à loger sur un compte-titres ordinaire (CTO), non simulé ici.",
+        },
+    ],
+}
+
 PEA_LAB_PRODUCTS = {
     "pea_sp500_psp5": {
         "label": "Amundi PEA S&P 500 UCITS ETF Acc",
