@@ -7,6 +7,7 @@ INSTRUMENTS = [
     {"code": "pea_sp500_psp5", "name": "Amundi PEA S&P 500 UCITS ETF Acc", "family": "pea", "source": "yahoo", "symbol": "PSP5.PA", "unit": "€", "decimals": 2},
     {"code": "pea_world_wpea", "name": "iShares MSCI World Swap PEA UCITS ETF", "family": "pea", "source": "yahoo", "symbol": "WPEA.PA", "unit": "€", "decimals": 2},
     {"code": "pea_eurostoxx50_euea", "name": "iShares Core EURO STOXX 50 UCITS ETF EUR (Dist)", "family": "pea", "source": "yahoo", "symbol": "EUEA.AS", "unit": "€", "decimals": 2},
+    {"code": "pea_eurostoxx50_h50e", "name": "HSBC EURO STOXX 50 UCITS ETF EUR", "family": "pea", "source": "yahoo", "symbol": "50E.PA", "unit": "€", "decimals": 2},
     {"code": "pea_cac40_cac", "name": "Amundi CAC 40 UCITS ETF Dist", "family": "pea", "source": "yahoo", "symbol": "CAC.PA", "unit": "€", "decimals": 2},
     {"code": "pea_world_dcam", "name": "Amundi PEA Monde (MSCI World) UCITS ETF Acc", "family": "pea", "source": "yahoo", "symbol": "DCAM.PA", "unit": "€", "decimals": 2},
     # --- Indices actions ---
@@ -155,7 +156,7 @@ MON_PORTEFEUILLE = {
     "lignes": [
         {"produit": "pea_sp500_psp5", "capital": 2000, "versement": 100, "depuis": None},
         {"produit": "pea_world_wpea", "capital": 1000, "versement": 50, "depuis": None},
-        {"produit": "pea_eurostoxx50_euea", "capital": 1000, "versement": 50, "depuis": None},
+        {"produit": "pea_eurostoxx50_h50e", "capital": 1000, "versement": 50, "depuis": None},
     ],
     "hors_pea": [
         {
@@ -212,6 +213,17 @@ PEA_LAB_PRODUCTS = {
         "exposure": "50 grandes entreprises de la zone euro",
         "replication": "Physique",
         "source_url": "https://www.blackrock.com/fr/particuliers/products/251781/ishares-euro-stoxx-50-ucits-etf-inc-fund",
+    },
+    "pea_eurostoxx50_h50e": {
+        "label": "HSBC EURO STOXX 50 UCITS ETF EUR",
+        "ticker": "50E",
+        "isin": "IE00B4K6B022",
+        "index": "EURO STOXX 50",
+        "ongoing_cost_pct": 0.05,
+        "inception": "2009-10-05",
+        "exposure": "50 grandes entreprises de la zone euro",
+        "replication": "Physique",
+        "source_url": "https://www.assetmanagement.hsbc.fr/fr/professional-investors/fund-centre/ie00b4k6b022",
     },
     "pea_cac40_cac": {
         "label": "Amundi CAC 40 UCITS ETF Dist",
