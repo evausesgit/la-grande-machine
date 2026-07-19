@@ -163,6 +163,16 @@ MON_PORTEFEUILLE = {
             "capital": 1000,
             "note": "Non éligible PEA — à loger sur un compte-titres ordinaire (CTO), non simulé ici.",
         },
+        {
+            "label": "iShares AI Innovation Active UCITS ETF (IART, LSE)",
+            "capital": 500,
+            "note": "ISIN IE000G0E83X3, TER 0,73% — ETF actif thématique IA, non éligible PEA, à loger en CTO, non simulé ici.",
+        },
+        {
+            "label": "iShares A.I. Innovation and Tech Active ETF (BAI, NYSE Arca)",
+            "capital": 500,
+            "note": "ISIN US09290C7801, frais 0,55% — ETF actif thématique IA, non éligible PEA, à loger en CTO, non simulé ici.",
+        },
     ],
 }
 

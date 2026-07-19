@@ -25,9 +25,12 @@ Yahoo le fournit, avec repli sur la clôture brute sinon.
 
 Stratégie réelle décidée le 16 juillet 2026, suivie sur `/portefeuille` (pas une exploration —
 une décision) : lump sum 2000€ S&P 500 + 1000€ MSCI World (WPEA) + 1000€ EURO STOXX 50 dans le
-PEA, puis versements mensuels 100€ / 50€ / 50€. Un investissement complémentaire de 1000€ en or
-(ETC physique) est prévu hors PEA sur compte-titres ordinaire (non éligible PEA, non simulé par
-cet outil). La configuration vit dans `MON_PORTEFEUILLE` (`app/config.py`) ; le champ `depuis` de
+PEA, puis versements mensuels 100€ / 50€ / 50€. Hors PEA, sur compte-titres ordinaire (non simulé
+par cet outil) : 1000€ en or (ETC physique), et depuis le 19 juillet 2026, 500€ sur iShares AI
+Innovation Active UCITS ETF (IART, LSE, ISIN IE000G0E83X3) et 500€ sur iShares A.I. Innovation and
+Tech Active ETF (BAI, NYSE Arca, ISIN US09290C7801) — deux ETF actifs thématiques IA suggérés par
+un collègue, non éligibles PEA (gestion active concentrée hors zone euro). La configuration vit
+dans `MON_PORTEFEUILLE` (`app/config.py`) ; le champ `depuis` de
 chaque ligne est `None` tant que l'ordre n'est pas passé (affichage de l'historique complet du
 support) et doit être renseigné à la date réelle d'achat une fois les ordres exécutés, pour que
 le suivi reflète la performance réelle plutôt que l'historique du fonds depuis son lancement.
