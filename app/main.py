@@ -14,7 +14,7 @@ from sqlalchemy.orm import Session
 from . import scheduler
 from .collectors.edgar13f import collect_13f
 from .collectors.run import collect_all, seed_gerants, seed_instruments
-from .config import FAMILIES, MON_PORTEFEUILLE, PEA_LAB_PRODUCTS
+from .config import FAMILIES, HORS_PEA_PRODUCTS, MON_PORTEFEUILLE, PEA_LAB_PRODUCTS
 from .db import Base, SessionLocal, engine
 from .engine.moves import compute_moves
 from .engine.pea_lab import LabSettings, simulate_pea
@@ -200,6 +200,10 @@ def api_laboratoire(
     return {"produit": PEA_LAB_PRODUCTS[produit], "parametres": settings.__dict__, "resultats": results}
 
 
+def _produit_info(code: str) -> dict:
+    return PEA_LAB_PRODUCTS.get(code) or HORS_PEA_PRODUCTS[code]
+
+
 def _run_portfolio_line(session: Session, ligne: dict):
     instrument = session.scalars(select(Instrument).where(Instrument.code == ligne["produit"])).first()
     if instrument is None:
@@ -211,7 +215,21 @@ def _run_portfolio_line(session: Session, ligne: dict):
     if len(prices) < 2:
         return None, "historique insuffisant : lancer une collecte profonde"
     settings = LabSettings(initial_capital=ligne["capital"], monthly_contribution=ligne["versement"])
-    return simulate_pea(prices, settings, "buy_hold"), None
+    resultat = simulate_pea(prices, settings, "buy_hold")
+
+    # % de variation entre la valorisation actuelle et celle de fin de mois précédent —
+    # rejoué en tronquant l'historique, pour rester cohérent avec le calcul buy_hold.
+    today = datetime.date.today()
+    fin_mois_precedent = today.replace(day=1) - datetime.timedelta(days=1)
+    prices_mois_precedent = [p for p in prices if p[0] <= fin_mois_precedent]
+    resultat["perf_mois_precedent_pct"] = None
+    if len(prices_mois_precedent) >= 2:
+        resultat_precedent = simulate_pea(prices_mois_precedent, settings, "buy_hold")
+        if resultat_precedent["final_value"]:
+            resultat["perf_mois_precedent_pct"] = round(
+                (resultat["final_value"] - resultat_precedent["final_value"]) / resultat_precedent["final_value"] * 100, 2
+            )
+    return resultat, None
 
 
 @app.get("/portefeuille")
@@ -224,10 +242,12 @@ def portefeuille(request: Request, session: Session = Depends(get_session)):
             total_contribue += resultat["contributed"]
             total_valeur += resultat["final_value"]
         lignes.append({
-            "produit": PEA_LAB_PRODUCTS[ligne["produit"]],
+            "produit": _produit_info(ligne["produit"]),
             "produit_id": ligne["produit"],
+            "pea": ligne["pea"],
             "capital": ligne["capital"],
             "versement": ligne["versement"],
+            "depuis": ligne.get("depuis"),
             "resultat": resultat,
             "erreur": erreur,
         })
@@ -241,7 +261,6 @@ def portefeuille(request: Request, session: Session = Depends(get_session)):
     return templates.TemplateResponse(request, "portefeuille.html", {
         "decide_le": MON_PORTEFEUILLE["decide_le"],
         "lignes": lignes,
-        "hors_pea": MON_PORTEFEUILLE["hors_pea"],
         "total": total,
     })
 

@@ -7,8 +7,13 @@ INSTRUMENTS = [
     {"code": "pea_sp500_psp5", "name": "Amundi PEA S&P 500 UCITS ETF Acc", "family": "pea", "source": "yahoo", "symbol": "PSP5.PA", "unit": "€", "decimals": 2},
     {"code": "pea_world_wpea", "name": "iShares MSCI World Swap PEA UCITS ETF", "family": "pea", "source": "yahoo", "symbol": "WPEA.PA", "unit": "€", "decimals": 2},
     {"code": "pea_eurostoxx50_euea", "name": "iShares Core EURO STOXX 50 UCITS ETF EUR (Dist)", "family": "pea", "source": "yahoo", "symbol": "EUEA.AS", "unit": "€", "decimals": 2},
+    {"code": "pea_eurostoxx50_h50e", "name": "HSBC EURO STOXX 50 UCITS ETF EUR", "family": "pea", "source": "yahoo", "symbol": "50E.PA", "unit": "€", "decimals": 2},
     {"code": "pea_cac40_cac", "name": "Amundi CAC 40 UCITS ETF Dist", "family": "pea", "source": "yahoo", "symbol": "CAC.PA", "unit": "€", "decimals": 2},
     {"code": "pea_world_dcam", "name": "Amundi PEA Monde (MSCI World) UCITS ETF Acc", "family": "pea", "source": "yahoo", "symbol": "DCAM.PA", "unit": "€", "decimals": 2},
+    # --- Hors PEA (stratégie perso, compte-titres ordinaire) ---
+    {"code": "or_amundi_gold", "name": "Amundi Physical Gold ETC", "family": "hors_pea", "source": "yahoo", "symbol": "GOLD.PA", "unit": "€", "decimals": 2},
+    {"code": "iart_ai_innovation", "name": "iShares AI Innovation Active UCITS ETF", "family": "hors_pea", "source": "yahoo", "symbol": "IART.L", "unit": "$", "decimals": 2},
+    {"code": "bai_ai_innovation_tech", "name": "iShares A.I. Innovation and Tech Active ETF", "family": "hors_pea", "source": "yahoo", "symbol": "BAI", "unit": "$", "decimals": 2},
     # --- Indices actions ---
     {"code": "sp500",    "name": "S&P 500 (États-Unis)",        "family": "indices", "source": "yahoo", "symbol": "^GSPC",     "unit": "pts",  "decimals": 0},
     {"code": "nasdaq",   "name": "Nasdaq Composite",             "family": "indices", "source": "yahoo", "symbol": "^IXIC",     "unit": "pts",  "decimals": 0},
@@ -136,6 +141,7 @@ TOP_N_13F = {"geant_13f": 50, "conviction_13f": 200}
 
 FAMILIES = {
     "pea":        {"label": "Laboratoire PEA",     "blurb": "Supports vérifiés comme éligibles au PEA, étudiés sans passage d'ordre."},
+    "hors_pea":   {"label": "Hors PEA (stratégie perso)", "blurb": "Compléments logés en compte-titres ordinaire, suivis pour la stratégie personnelle réelle — non éligibles PEA."},
     "indices":    {"label": "Indices actions",      "blurb": "La météo des Bourses mondiales."},
     "actions":    {"label": "Actions phares",       "blurb": "Quelques champions pour incarner les mouvements."},
     "taux":       {"label": "Taux d'intérêt",       "blurb": "Le prix du temps — le marché le plus puissant du monde."},
@@ -150,32 +156,16 @@ FAMILIES = {
 # "depuis" : None tant que l'achat n'est pas passé (on affiche l'historique complet
 # du support) ; une fois l'ordre exécuté, renseigner la date réelle (YYYY-MM-DD) pour
 # que le suivi ne parte que de l'entrée effective, pas de l'historique du fonds.
+# "pea" distingue les lignes logées dans le PEA de celles en compte-titres ordinaire.
 MON_PORTEFEUILLE = {
     "decide_le": "2026-07-16",
     "lignes": [
-        {"produit": "pea_sp500_psp5", "capital": 2000, "versement": 100, "depuis": None},
-        {"produit": "pea_world_wpea", "capital": 1000, "versement": 50, "depuis": None},
-        {"produit": "pea_eurostoxx50_euea", "capital": 1000, "versement": 50, "depuis": None},
-    ],
-    "hors_pea": [
-        {
-            "label": "Or (ETC physique)",
-            "capital": 1000,
-            "isin": None,
-            "note": "Non éligible PEA — à loger sur un compte-titres ordinaire (CTO), non simulé ici.",
-        },
-        {
-            "label": "iShares AI Innovation Active UCITS ETF (IART, LSE)",
-            "capital": 500,
-            "isin": "IE000G0E83X3",
-            "note": "TER 0,73% — ETF actif thématique IA, non éligible PEA, à loger en CTO, non simulé ici.",
-        },
-        {
-            "label": "iShares A.I. Innovation and Tech Active ETF (BAI, NYSE Arca)",
-            "capital": 500,
-            "isin": "US09290C7801",
-            "note": "Frais 0,55% — ETF actif thématique IA, non éligible PEA, à loger en CTO, non simulé ici.",
-        },
+        {"produit": "pea_sp500_psp5", "pea": True, "capital": 2000, "versement": 100, "depuis": None},
+        {"produit": "pea_world_wpea", "pea": True, "capital": 1000, "versement": 50, "depuis": None},
+        {"produit": "pea_eurostoxx50_h50e", "pea": True, "capital": 1000, "versement": 50, "depuis": None},
+        {"produit": "or_amundi_gold", "pea": False, "capital": 1000, "versement": 0, "depuis": None},
+        {"produit": "iart_ai_innovation", "pea": False, "capital": 500, "versement": 0, "depuis": None},
+        {"produit": "bai_ai_innovation_tech", "pea": False, "capital": 500, "versement": 0, "depuis": None},
     ],
 }
 
@@ -213,6 +203,17 @@ PEA_LAB_PRODUCTS = {
         "replication": "Physique",
         "source_url": "https://www.blackrock.com/fr/particuliers/products/251781/ishares-euro-stoxx-50-ucits-etf-inc-fund",
     },
+    "pea_eurostoxx50_h50e": {
+        "label": "HSBC EURO STOXX 50 UCITS ETF EUR",
+        "ticker": "50E",
+        "isin": "IE00B4K6B022",
+        "index": "EURO STOXX 50",
+        "ongoing_cost_pct": 0.05,
+        "inception": "2009-10-05",
+        "exposure": "50 grandes entreprises de la zone euro",
+        "replication": "Physique",
+        "source_url": "https://www.assetmanagement.hsbc.fr/fr/professional-investors/fund-centre/ie00b4k6b022",
+    },
     "pea_cac40_cac": {
         "label": "Amundi CAC 40 UCITS ETF Dist",
         "ticker": "CAC",
@@ -234,5 +235,37 @@ PEA_LAB_PRODUCTS = {
         "exposure": "Grandes et moyennes entreprises des marchés développés, structuré par swap pour le PEA",
         "replication": "Synthétique",
         "source_url": "https://www.amundietf.fr/fr/professionnels/produits/equity/amundi-pea-monde-msci-world-ucits-etf/fr001400u5q4",
+    },
+}
+
+# Compléments hors PEA de la stratégie réelle — même forme que PEA_LAB_PRODUCTS,
+# non éligibles PEA donc absents du Laboratoire (pas de comparaison de stratégies).
+HORS_PEA_PRODUCTS = {
+    "or_amundi_gold": {
+        "label": "Amundi Physical Gold ETC",
+        "ticker": "GOLD",
+        "isin": "FR0013416716",
+        "ongoing_cost_pct": 0.12,
+        "exposure": "Or physique, allocation directe (HSBC Bank Plc, dépositaire)",
+        "note": "Or physique — à loger sur un compte-titres ordinaire (CTO), non éligible PEA.",
+        "source_url": "https://www.amundietf.fr/fr/particuliers/produits/matieres-premieres/amundi-physical-gold-etc-c/fr0013416716",
+    },
+    "iart_ai_innovation": {
+        "label": "iShares AI Innovation Active UCITS ETF",
+        "ticker": "IART",
+        "isin": "IE000G0E83X3",
+        "ongoing_cost_pct": 0.73,
+        "exposure": "ETF actif thématique intelligence artificielle, cotation LSE",
+        "note": "Non éligible PEA — à loger sur un compte-titres ordinaire (CTO).",
+        "source_url": "https://www.ishares.com/uk/individual/en/products/338781/ishares-ai-innovation-active-ucits-etf",
+    },
+    "bai_ai_innovation_tech": {
+        "label": "iShares A.I. Innovation and Tech Active ETF",
+        "ticker": "BAI",
+        "isin": "US09290C7801",
+        "ongoing_cost_pct": 0.55,
+        "exposure": "ETF actif thématique IA/tech, cotation NYSE Arca",
+        "note": "Non éligible PEA — à loger sur un compte-titres ordinaire (CTO).",
+        "source_url": "https://www.ishares.com/us/products/339081/ishares-a-i-innovation-and-tech-active-etf",
     },
 }

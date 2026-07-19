@@ -81,12 +81,12 @@ def collect_all(session: Session, deep: bool = False, families: set[str] | None 
                 point_count = session.scalar(
                     select(func.count(PriceDaily.id)).where(PriceDaily.instrument_id == inst.id)
                 )
-                # Un nouveau support PEA doit être utilisable après la première
-                # collecte planifiée, sans attendre un an ni une action manuelle.
-                bootstrap_pea = inst.family == "pea" and (point_count or 0) < 252
+                # Un nouveau support PEA ou hors-PEA (stratégie perso) doit être utilisable
+                # après la première collecte planifiée, sans attendre un an ni une action manuelle.
+                bootstrap_new = inst.family in {"pea", "hors_pea"} and (point_count or 0) < 252
                 rows = yahoo.fetch_history(
                     inst.symbol,
-                    range_=deep_range if deep or bootstrap_pea else "1mo",
+                    range_=deep_range if deep or bootstrap_new else "1mo",
                 )
                 time.sleep(0.4)  # courtoisie : ~40 requêtes par collecte
             elif inst.source == "fred":

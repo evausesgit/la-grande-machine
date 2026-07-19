@@ -60,11 +60,11 @@ class CollectorTests(unittest.TestCase):
 
         self.assertEqual(set(report), {
             "pea_sp500_psp5", "pea_world_wpea",
-            "pea_eurostoxx50_euea", "pea_cac40_cac", "pea_world_dcam",
+            "pea_eurostoxx50_euea", "pea_eurostoxx50_h50e", "pea_cac40_cac", "pea_world_dcam",
         })
         self.assertEqual(
             {call.args[0] for call in yahoo_fetch.call_args_list},
-            {"PSP5.PA", "WPEA.PA", "EUEA.AS", "CAC.PA", "DCAM.PA"},
+            {"PSP5.PA", "WPEA.PA", "EUEA.AS", "50E.PA", "CAC.PA", "DCAM.PA"},
         )
         fred_fetch.assert_not_called()
 

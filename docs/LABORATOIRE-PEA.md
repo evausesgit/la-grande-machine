@@ -8,7 +8,8 @@ Le laboratoire compare des règles d'investissement sur des supports expliciteme
 |---|---|---|---|
 | `pea_sp500_psp5` | Amundi PEA S&P 500 UCITS ETF Acc | `FR0011871128` | historique long pour éprouver le moteur |
 | `pea_world_wpea` | iShares MSCI World Swap PEA UCITS ETF | `IE0002XZSHO1` | cœur mondial diversifié, historique depuis 2024 |
-| `pea_eurostoxx50_euea` | iShares Core EURO STOXX 50 UCITS ETF EUR (Dist) | `IE0008471009` | zone euro, réplication physique, historique depuis 2000 |
+| `pea_eurostoxx50_euea` | iShares Core EURO STOXX 50 UCITS ETF EUR (Dist) | `IE0008471009` | zone euro, réplication physique, historique depuis 2000 ; coté Amsterdam, introuvable sur IBKR PEA |
+| `pea_eurostoxx50_h50e` | HSBC EURO STOXX 50 UCITS ETF EUR | `IE00B4K6B022` | zone euro, réplication physique, TER 0,05% (le plus bas des trois), coté Euronext Paris — support réellement acheté |
 | `pea_cac40_cac` | Amundi CAC 40 UCITS ETF Dist (ex-Lyxor) | `FR0007052782` | France, réplication physique, historique depuis 2000 |
 | `pea_world_dcam` | Amundi PEA Monde (MSCI World) UCITS ETF Acc | `FR001400U5Q4` | cœur mondial éligible PEA par swap, alternative à `pea_world_wpea`, historique depuis mars 2025 |
 
@@ -24,16 +25,34 @@ Yahoo le fournit, avec repli sur la clôture brute sinon.
 ## Mon portefeuille
 
 Stratégie réelle décidée le 16 juillet 2026, suivie sur `/portefeuille` (pas une exploration —
-une décision) : lump sum 2000€ S&P 500 + 1000€ MSCI World (WPEA) + 1000€ EURO STOXX 50 dans le
-PEA, puis versements mensuels 100€ / 50€ / 50€. Hors PEA, sur compte-titres ordinaire (non simulé
+une décision) : lump sum 2000€ S&P 500 (PSP5) + 1000€ MSCI World (WPEA) + 1000€ EURO STOXX 50 dans le
+PEA, puis versements mensuels 100€ / 50€ / 50€. La ligne EURO STOXX 50 a été exécutée sur HSBC
+EURO STOXX 50 UCITS ETF EUR (`pea_eurostoxx50_h50e`, ISIN IE00B4K6B022, TER 0,05%) et non sur
+`pea_eurostoxx50_euea` initialement envisagé : ce dernier est coté à Amsterdam et n'apparaissait
+pas dans le catalogue PEA d'Interactive Brokers, contrairement au HSBC coté à Paris. Hors PEA, sur
+compte-titres ordinaire (non simulé
 par cet outil) : 1000€ en or (ETC physique), et depuis le 19 juillet 2026, 500€ sur iShares AI
 Innovation Active UCITS ETF (IART, LSE, ISIN IE000G0E83X3) et 500€ sur iShares A.I. Innovation and
 Tech Active ETF (BAI, NYSE Arca, ISIN US09290C7801) — deux ETF actifs thématiques IA suggérés par
 un collègue, non éligibles PEA (gestion active concentrée hors zone euro). La configuration vit
-dans `MON_PORTEFEUILLE` (`app/config.py`) ; le champ `depuis` de
-chaque ligne est `None` tant que l'ordre n'est pas passé (affichage de l'historique complet du
-support) et doit être renseigné à la date réelle d'achat une fois les ordres exécutés, pour que
-le suivi reflète la performance réelle plutôt que l'historique du fonds depuis son lancement.
+dans `MON_PORTEFEUILLE` (`app/config.py`), une seule liste `lignes` avec un booléen `pea` par ligne
+(fini la séparation `lignes`/`hors_pea` d'origine). Le champ `depuis` de chaque ligne est `None`
+tant que l'ordre n'est pas passé (affichage de l'historique complet du support) et doit être
+renseigné à la date réelle d'achat une fois les ordres exécutés, pour que le suivi reflète la
+performance réelle plutôt que l'historique du fonds depuis son lancement.
+
+Les trois compléments hors PEA (or, IART, BAI) sont désormais suivis comme des instruments à part
+entière (famille `hors_pea` dans `INSTRUMENTS`, prix collectés quotidiennement comme le PEA) plutôt
+que de simples notes déclaratives — leurs métadonnées (ticker, ISIN, frais courants) vivent dans
+`HORS_PEA_PRODUCTS` (`app/config.py`), sur le même modèle que `PEA_LAB_PRODUCTS`. Ils n'apparaissent
+pas au Laboratoire (comparaison de stratégies réservée aux supports PEA), seulement sur
+`/portefeuille`.
+
+`/portefeuille` affiche un tableau unique, toutes lignes confondues (PEA et hors PEA), avec pour
+chaque produit : éligibilité PEA, date d'investissement réelle (ou historique complet si l'ordre
+n'est pas encore exécuté), frais courants de l'ETF, notional investi à ce jour, valorisation
+actuelle, variation par rapport à la valorisation recalculée à la clôture du mois précédent, et
+performance cumulée depuis le début de la ligne.
 
 ## Stratégies
 
