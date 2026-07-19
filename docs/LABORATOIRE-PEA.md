@@ -35,10 +35,24 @@ par cet outil) : 1000€ en or (ETC physique), et depuis le 19 juillet 2026, 500
 Innovation Active UCITS ETF (IART, LSE, ISIN IE000G0E83X3) et 500€ sur iShares A.I. Innovation and
 Tech Active ETF (BAI, NYSE Arca, ISIN US09290C7801) — deux ETF actifs thématiques IA suggérés par
 un collègue, non éligibles PEA (gestion active concentrée hors zone euro). La configuration vit
-dans `MON_PORTEFEUILLE` (`app/config.py`) ; le champ `depuis` de
-chaque ligne est `None` tant que l'ordre n'est pas passé (affichage de l'historique complet du
-support) et doit être renseigné à la date réelle d'achat une fois les ordres exécutés, pour que
-le suivi reflète la performance réelle plutôt que l'historique du fonds depuis son lancement.
+dans `MON_PORTEFEUILLE` (`app/config.py`), une seule liste `lignes` avec un booléen `pea` par ligne
+(fini la séparation `lignes`/`hors_pea` d'origine). Le champ `depuis` de chaque ligne est `None`
+tant que l'ordre n'est pas passé (affichage de l'historique complet du support) et doit être
+renseigné à la date réelle d'achat une fois les ordres exécutés, pour que le suivi reflète la
+performance réelle plutôt que l'historique du fonds depuis son lancement.
+
+Les trois compléments hors PEA (or, IART, BAI) sont désormais suivis comme des instruments à part
+entière (famille `hors_pea` dans `INSTRUMENTS`, prix collectés quotidiennement comme le PEA) plutôt
+que de simples notes déclaratives — leurs métadonnées (ticker, ISIN, frais courants) vivent dans
+`HORS_PEA_PRODUCTS` (`app/config.py`), sur le même modèle que `PEA_LAB_PRODUCTS`. Ils n'apparaissent
+pas au Laboratoire (comparaison de stratégies réservée aux supports PEA), seulement sur
+`/portefeuille`.
+
+`/portefeuille` affiche un tableau unique, toutes lignes confondues (PEA et hors PEA), avec pour
+chaque produit : éligibilité PEA, date d'investissement réelle (ou historique complet si l'ordre
+n'est pas encore exécuté), frais courants de l'ETF, notional investi à ce jour, valorisation
+actuelle, variation par rapport à la valorisation recalculée à la clôture du mois précédent, et
+performance cumulée depuis le début de la ligne.
 
 ## Stratégies
 

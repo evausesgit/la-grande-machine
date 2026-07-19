@@ -54,6 +54,27 @@ class PortfolioLineTests(unittest.TestCase):
         self.assertIsNone(resultat)
         self.assertIn("absent", erreur)
 
+    def test_month_over_month_perf_reflects_a_jump_after_previous_month_end(self):
+        instrument = self.session.scalar(select(Instrument).where(Instrument.code == "pea_world_wpea"))
+        today = datetime.date.today()
+        fin_mois_precedent = today.replace(day=1) - datetime.timedelta(days=1)
+        debut = today - datetime.timedelta(days=100)
+        rows = []
+        day = debut
+        while day <= today:
+            price = 100.0 if day <= fin_mois_precedent else 120.0
+            rows.append(PriceDaily(instrument_id=instrument.id, date=day, close=price))
+            day += datetime.timedelta(days=1)
+        self.session.add_all(rows)
+        self.session.commit()
+
+        resultat, erreur = _run_portfolio_line(
+            self.session, {"produit": "pea_world_wpea", "capital": 1000, "versement": 0, "depuis": None}
+        )
+        self.assertIsNone(erreur)
+        self.assertIsNotNone(resultat["perf_mois_precedent_pct"])
+        self.assertGreater(resultat["perf_mois_precedent_pct"], 15)
+
 
 if __name__ == "__main__":
     unittest.main()

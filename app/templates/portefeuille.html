@@ -17,49 +17,63 @@
 
 {% if total %}
 <section class="product-card">
-  <div><strong>Total PEA (3 lignes)</strong></div>
+  <div><strong>Total PEA (lignes exécutées)</strong></div>
   <div>{{ total.valeur | fmt_valeur(0) }} € · {{ total.contribue | fmt_valeur(0) }} € versés · gain {{ total.gain | fmt_valeur(0) }} €</div>
 </section>
 {% endif %}
 
 <section>
-  <div class="eyebrow">Lignes du PEA</div>
-  <div class="lab-results">
-    {% for ligne in lignes %}
-    <article class="metric-card">
-      <h2>{{ ligne.produit.ticker }} — {{ ligne.produit.label }}</h2>
-      {% if ligne.resultat %}
-      <div class="big-number">{{ ligne.resultat.final_value | fmt_valeur(0) }} €</div>
-      <p class="hint">{{ ligne.capital | fmt_valeur(0) }} € au départ + {{ ligne.versement | fmt_valeur(0) }} €/mois ·
-        {{ ligne.resultat.contributed | fmt_valeur(0) }} € versés · gain {{ ligne.resultat.gain | fmt_valeur(0) }} €</p>
-      <dl>
-        <div><dt>Depuis</dt><dd>{{ ligne.resultat.start_date }}</dd></div>
-        <div><dt>Rendement cumulé</dt><dd>{{ ligne.resultat.return_pct | fmt_valeur(2) }} %</dd></div>
-        <div><dt>Rendement annualisé</dt><dd>{{ ligne.resultat.cagr_pct | fmt_valeur(2) }} %</dd></div>
-        <div><dt>Perte maximale traversée</dt><dd>{{ ligne.resultat.max_drawdown_pct | fmt_valeur(2) }} %</dd></div>
-      </dl>
-      <p class="hint"><a href="/laboratoire?produit={{ ligne.produit_id }}&capital={{ ligne.capital | int }}&versement={{ ligne.versement | int }}">Détail et comparaison avec la stratégie tendance →</a></p>
-      {% else %}
-      <p class="hint">{{ ligne.erreur }}</p>
-      {% endif %}
-    </article>
-    {% endfor %}
+  <div class="eyebrow">Toutes les lignes</div>
+  <p class="hint">Tant qu'aucune date d'achat réelle n'est renseignée (colonne « Depuis »), la ligne affiche
+  l'historique complet disponible pour ce support — les lignes n'ont donc pas toutes la même profondeur
+  d'historique et ne doivent pas être comparées telles quelles. « % vs mois précédent » compare la valorisation
+  actuelle à celle recalculée à la clôture du mois précédent.</p>
+  <div style="overflow-x:auto;">
+  <table class="pf">
+    <thead>
+      <tr>
+        <th>Produit</th>
+        <th>PEA</th>
+        <th>Depuis</th>
+        <th>Frais</th>
+        <th class="num">Notional</th>
+        <th class="num">Valorisation</th>
+        <th class="num">% vs mois préc.</th>
+        <th class="num">% depuis le début</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for ligne in lignes %}
+      <tr>
+        <td>
+          <strong>{{ ligne.produit.ticker }}</strong> — {{ ligne.produit.label }}
+          {% if ligne.pea %}<div class="hint" style="margin:0;"><a href="/laboratoire?produit={{ ligne.produit_id }}&capital={{ ligne.capital | int }}&versement={{ ligne.versement | int }}">comparer au Laboratoire →</a></div>{% endif %}
+        </td>
+        <td>{{ "Oui" if ligne.pea else "Non" }}</td>
+        {% if ligne.resultat %}
+        <td>{{ ligne.depuis or ligne.resultat.start_date }}{% if not ligne.depuis %} <span class="hint" style="margin:0;">(historique complet)</span>{% endif %}</td>
+        <td>{{ ligne.produit.ongoing_cost_pct | fmt_valeur(2) }} %/an</td>
+        <td class="num">{{ ligne.resultat.contributed | fmt_valeur(0) }} €</td>
+        <td class="num">{{ ligne.resultat.final_value | fmt_valeur(0) }} €</td>
+        <td class="num {{ 'up' if ligne.resultat.perf_mois_precedent_pct and ligne.resultat.perf_mois_precedent_pct > 0 else ('down' if ligne.resultat.perf_mois_precedent_pct and ligne.resultat.perf_mois_precedent_pct < 0 else '') }}">
+          {{ (ligne.resultat.perf_mois_precedent_pct | fmt_valeur(2)) ~ " %" if ligne.resultat.perf_mois_precedent_pct is not none else "—" }}
+        </td>
+        <td class="num {{ 'up' if ligne.resultat.return_pct > 0 else ('down' if ligne.resultat.return_pct < 0 else '') }}">{{ ligne.resultat.return_pct | fmt_valeur(2) }} %</td>
+        {% else %}
+        <td colspan="6"><span class="hint" style="margin:0;">{{ ligne.erreur }}</span></td>
+        {% endif %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
   </div>
 </section>
 
 <section class="lab-explain">
-  <div class="eyebrow">Hors PEA</div>
-  {% for item in hors_pea %}
-  <p><strong>{{ item.label }}</strong> · {{ item.capital | fmt_valeur(0) }} €{% if item.isin %} · ISIN {{ item.isin }}{% endif %} · {{ item.note }}</p>
+  <div class="eyebrow">Notes par ligne</div>
+  {% for ligne in lignes %}
+  {% if ligne.produit.note %}<p class="hint">{{ ligne.produit.ticker }} — {{ ligne.produit.note }}</p>{% endif %}
   {% endfor %}
-</section>
-
-<section class="lab-explain">
-  <div class="eyebrow">Comment lire ces chiffres</div>
-  <p class="hint">Tant qu'aucune date d'achat réelle n'est renseignée, chaque ligne affiche l'historique complet
-  disponible pour ce support (pas seulement depuis la décision du {{ decide_le }}) — les trois lignes n'ont donc
-  pas la même profondeur d'historique et ne doivent pas être comparées entre elles telles quelles. Une fois les
-  ordres exécutés, le suivi sera recalé sur la date réelle d'achat.</p>
 </section>
 
 <footer>
