@@ -50,7 +50,7 @@
 <section class="lab-explain">
   <div class="eyebrow">Hors PEA</div>
   {% for item in hors_pea %}
-  <p><strong>{{ item.label }}</strong> · {{ item.capital | fmt_valeur(0) }} € · {{ item.note }}</p>
+  <p><strong>{{ item.label }}</strong> · {{ item.capital | fmt_valeur(0) }} €{% if item.isin %} · ISIN {{ item.isin }}{% endif %} · {{ item.note }}</p>
   {% endfor %}
 </section>
 
