@@ -96,6 +96,7 @@ Solution de repli documentée : appel direct de l'API Claude depuis l'app.
 | `/acteurs` | Les positions COT par type d'acteur, évolution des bilans de banques centrales |
 | `/archives` | Tous les briefs passés, navigables par date — « le film » |
 | `/comprendre` | La v1 pédagogique (réservoirs, circuit, géants, lexique) |
+| `/flux` | Le bassin versant des grandes masses : épargne → collecteurs → mers d'actifs. Scénario « Aujourd'hui » calculé depuis la base (le « souffle » de chaque mer sur 30 séances pilote la largeur des rivières) + 3 scénarios pédagogiques. Chaque chiffre porte sa provenance : mesuré / lu / ordre de grandeur documenté. JSON : `GET /api/flux` |
 
 ## 6. Architecture technique
 

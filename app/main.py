@@ -16,6 +16,7 @@ from .collectors.edgar13f import collect_13f
 from .collectors.run import collect_all, seed_gerants, seed_instruments
 from .config import FAMILIES, HORS_PEA_PRODUCTS, MON_PORTEFEUILLE, PEA_LAB_PRODUCTS
 from .db import Base, SessionLocal, engine
+from .engine.flux import bassin
 from .engine.moves import compute_moves
 from .engine.pea_lab import LabSettings, simulate_pea
 from .models import AssetManager, Brief, Fund, FundSnapshot, Instrument, Position, PriceDaily
@@ -95,6 +96,16 @@ def comprendre():
 @app.get("/rivieres")
 def rivieres():
     return FileResponse(ROOT / "viz" / "rivieres-lacs.html", media_type="text/html")
+
+
+@app.get("/flux")
+def flux(request: Request, session: Session = Depends(get_session)):
+    return templates.TemplateResponse(request, "flux.html", {"bassin": bassin(session)})
+
+
+@app.get("/api/flux")
+def api_flux(session: Session = Depends(get_session)):
+    return bassin(session)
 
 
 TYPES_GERANTS = {

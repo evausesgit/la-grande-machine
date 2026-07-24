@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Le bassin versant de l'argent — La Grande Machine</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏦</text></svg>">
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="site"><a href="/" style="color:inherit;text-decoration:none">La Grande Machine — l'observatoire</a></div>
+  <h1>Le bassin versant <span class="amp">de l'argent</span></h1>
+  <p class="lede">Où dort l'argent du monde, et par où il coule. Les <strong>lacs</strong> sont
+  les stocks — leur taille dit combien. Les <strong>rivières</strong> sont les flux — leur largeur
+  dit le débit, les particules montrent le sens du courant.</p>
+  <nav class="toplinks">
+    <a href="/">← L'observatoire</a> ·
+    <a href="/fonds">Les fonds des gérants</a> ·
+    <a href="/comprendre">Comprendre la machine</a> ·
+    <a href="/api/flux">Les données de cette page (JSON)</a>
+  </nav>
+</header>
+
+<section>
+  <div class="eyebrow">Choisir ce qu'on regarde</div>
+  <p class="hint">« Aujourd'hui » est calculé depuis nos données. Les trois autres sont des
+  scénarios pédagogiques : ils montrent comment la machine <em>réagirait</em>, pas ce qui se passe.</p>
+  <div class="scenarios" id="scenarios" role="group" aria-label="Scénarios"></div>
+  <p class="scenario-note" id="scenario-note"></p>
+
+  <div class="scene-wrap">
+    <svg id="bassin" viewBox="0 0 1200 660" role="img"
+         aria-label="Carte animée du bassin versant : l'épargne coule des ménages et des banques centrales
+                     vers les collecteurs (fonds de pension, assureurs, gérants, hedge funds), puis vers les
+                     grandes mers d'actifs (actions, obligations, or, bitcoin, monétaire).
+                     Les chiffres détaillés sont dans les tableaux qui suivent."></svg>
+  </div>
+  <div class="legende" id="legende"></div>
+</section>
+
+<section>
+  <div class="eyebrow">Le courant du mois écoulé</div>
+  <p class="hint">De quel côté l'argent a penché ces {{ bassin.fenetre_seances }} dernières séances,
+  lu dans les cours de notre base. Le <strong>souffle</strong> rapporte le mouvement à l'habitude de
+  chaque marché : +1 veut dire « un mois inhabituellement porteur », −1 l'inverse. C'est ce souffle
+  qui pilote la largeur des rivières dans « Aujourd'hui ».</p>
+  {% if bassin.courants %}
+  <div class="table-wrap">
+    <table class="flux-table">
+      <thead>
+        <tr>
+          <th>Mer d'actifs</th>
+          <th class="num">Sur le mois</th>
+          <th class="num">Souffle</th>
+          <th>Ce qu'on lit, et où</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in bassin.courants %}
+        <tr>
+          <td>{{ c.nom }}</td>
+          <td class="num {{ 'up' if c.variation_pct > 0 else ('down' if c.variation_pct < 0 else '') }}">
+            {{ "%+.2f" | format(c.variation_pct) | replace(".", ",") }} %</td>
+          <td class="num">{{ "%+.2f" | format(c.souffle) | replace(".", ",") }}</td>
+          <td class="source">{{ c.lecture }} <span class="provenance lu">lu</span><br>
+            {{ c.series | join(", ") }} — au {{ c.date.split('-') | reverse | join('/') }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <p class="a-venir">Pas encore assez d'historique collecté pour situer le mois écoulé par rapport
+  à l'habitude de chaque marché. Le scénario « Aujourd'hui » reprendra vie après une collecte profonde.</p>
+  {% endif %}
+</section>
+
+<section>
+  <div class="eyebrow">D'où vient chaque chiffre</div>
+  <p class="hint">Personne ne publie gratuitement les masses financières mondiales en temps réel.
+  Cette page mélange donc deux natures de chiffres — et le dit ligne par ligne.
+  <strong>Mesuré</strong> : calculé depuis notre base. <strong>Ordre de grandeur</strong> :
+  publié par une institution, repris tel quel, jamais recalculé par nous.</p>
+  <div class="table-wrap">
+    <table class="flux-table">
+      <thead>
+        <tr><th>Masse</th><th class="num">Stock (T$)</th><th>Provenance</th></tr>
+      </thead>
+      <tbody>
+        {% for lac in bassin.lacs %}
+        <tr>
+          <td>{{ lac.nom }}<br><span class="source">{{ lac.note }}</span></td>
+          <td class="num">{% if lac.provenance != 'mesure' %}≈ {% endif %}{{ lac.stock | fmt_valeur(1) }}</td>
+          <td class="source">
+            {% if lac.provenance == 'mesure' %}
+              <span class="provenance mesure">mesuré</span> {{ lac.mesure.detail }} — au {{ lac.mesure.date.split('-') | reverse | join('/') }}
+            {% else %}
+              <span class="provenance">ordre de grandeur</span> {{ lac.source }}
+            {% endif %}
+            {% if lac.part_mesuree %}
+            <br><span class="provenance mesure">dont mesuré</span>
+            {{ lac.part_mesuree.stock | fmt_valeur(2) }} T$ — {{ lac.part_mesuree.detail }},
+            au {{ lac.part_mesuree.date.split('-') | reverse | join('/') }}
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <details class="replis">
+    <summary>Voir les débits des rivières en tableau</summary>
+    <div class="table-wrap"><table class="flux-table" id="table-rivieres"></table></div>
+    <p class="hint" style="margin-top:10px">Les débits mondiaux ne sont publiés nulle part :
+    ces valeurs sont <strong>illustratives</strong>, calibrées pour respecter les proportions connues
+    (l'épargne va surtout aux collecteurs, les collecteurs surtout aux obligations et aux actions).
+    Ce que les données pilotent vraiment, c'est leur <em>orientation</em> — le tableau du courant ci-dessus.</p>
+  </details>
+</section>
+
+<footer>
+  <p><a href="/">← Retour à l'observatoire</a> ·
+     <a href="/rivieres">Le prototype d'origine</a></p>
+  <p class="hint">Outil pédagogique — ceci n'est pas un conseil d'investissement.
+  Une hausse de prix n'est pas un flux : quand une mer monte un mois durant, l'argent a
+  probablement penché de ce côté, mais aucune donnée publique gratuite ne mesure les
+  virements réels. Les seuls flux vraiment mesurables ici arriveront avec les rapports
+  COT de la CFTC et les variations trimestrielles des dépôts 13F.</p>
+</footer>
+
+</div>
+<div id="tooltip"></div>
+<script type="application/json" id="bassin-data">{{ bassin | tojson }}</script>
+<script src="/static/flux.js"></script>
+</body>
+</html>
