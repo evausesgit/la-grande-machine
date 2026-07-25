@@ -13,9 +13,6 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    networks:
-      - default
-      - coolify
 
   db:
     image: postgres:16-alpine
@@ -32,10 +29,6 @@ services:
       interval: 5s
       timeout: 3s
       retries: 10
-
-networks:
-  coolify:
-    external: true
 
 volumes:
   machine-db-v2:
