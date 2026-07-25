@@ -48,8 +48,9 @@ def _brief_du_matin():
     from .brief_writer import generer_et_publier
     from .db import SessionLocal
 
-    if not os.environ.get("ANTHROPIC_API_KEY"):
-        log.warning("brief du matin sauté : ANTHROPIC_API_KEY absente")
+    codex_home = os.environ.get("CODEX_HOME", os.path.expanduser("~/.codex"))
+    if not os.path.exists(os.path.join(codex_home, "auth.json")):
+        log.warning("brief du matin sauté : auth codex absente (%s)", codex_home)
         return
     with SessionLocal() as session:
         try:

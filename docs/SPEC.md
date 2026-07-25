@@ -64,8 +64,12 @@ Chaque mouvement est expliqué par trois couches croisées :
 **Un job planifié dans le container de l'app** (`app/scheduler.py`, 6h45 Europe/Paris,
 `app/brief_writer.py`) :
 1. calcule les mouvements du jour en interne (même fonction que `GET /api/journee`) ;
-2. appelle l'API Claude (`ANTHROPIC_API_KEY`, outil `web_search` intégré) pour la
-   recherche d'actualités et la rédaction ;
+2. délègue la recherche d'actualités et la rédaction à `codex exec` (CLI OpenAI Codex,
+   accès shell + réseau dans son bac à sable, `--output-schema` pour forcer la forme
+   JSON) — authentifié via le login ChatGPT d'Eva monté en lecture seule dans le
+   container (`CODEX_AUTH_PATH`, voir `compose.yaml`) plutôt qu'une clé API. Le process
+   codex tourne avec un environnement restreint (pas de `DB_PASSWORD`/`ADMIN_TOKEN`),
+   pour limiter ce qu'un accès shell+réseau non supervisé pourrait exfiltrer ;
 3. publie directement en base via la même logique que `POST /api/brief`.
 
 Historique : la v1 de ce chantier utilisait une routine planifiée externe (claude.ai
