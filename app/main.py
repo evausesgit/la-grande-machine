@@ -98,6 +98,11 @@ def rivieres():
     return FileResponse(ROOT / "viz" / "rivieres-lacs.html", media_type="text/html")
 
 
+@app.get("/flux-entreprises")
+def flux_entreprises():
+    return FileResponse(ROOT / "viz" / "flux-entreprises.html", media_type="text/html")
+
+
 @app.get("/flux")
 def flux(request: Request, session: Session = Depends(get_session)):
     return templates.TemplateResponse(request, "flux.html", {"bassin": bassin(session)})

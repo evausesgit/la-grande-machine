@@ -1,0 +1,281 @@
+<title>La Grande Machine — la carte des modèles d'entreprise</title>
+<style>
+  :root {
+    --paper: #f9f9f7;
+    --surface: #fcfcfb;
+    --ink: #0b0b0b;
+    --ink-2: #52514e;
+    --ink-3: #8a8880;
+    --hairline: rgba(11,11,11,0.10);
+    --grid: #e1e0d9;
+    --brass: #8a6d1f;
+    --brass-soft: rgba(138,109,31,0.12);
+    --zone-fill: rgba(138,109,31,0.07);
+    --zone-stroke: rgba(138,109,31,0.35);
+
+    --c-saas: #2a78d6;
+    --c-market: #199e70;
+    --c-rente: #c98500;
+    --c-gestion: #4a3aa7;
+    --c-pub: #d55181;
+    --c-ip: #2f8f8a;
+    --c-lourd: #5b6b73;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #0d0d0d; --surface: #1a1a19;
+      --ink: #ffffff; --ink-2: #c3c2b7; --ink-3: #8a887d;
+      --hairline: rgba(255,255,255,0.10); --grid: #2c2c2a;
+      --brass: #d4b356; --brass-soft: rgba(212,179,86,0.14);
+      --zone-fill: rgba(212,179,86,0.08); --zone-stroke: rgba(212,179,86,0.32);
+      --c-saas: #3987e5; --c-market: #1baf7a; --c-rente: #c98500;
+      --c-gestion: #9085e9; --c-pub: #d55181; --c-ip: #4db8b0; --c-lourd: #8fa3ab;
+    }
+  }
+  :root[data-theme="dark"] {
+    --paper: #0d0d0d; --surface: #1a1a19;
+    --ink: #ffffff; --ink-2: #c3c2b7; --ink-3: #8a887d;
+    --hairline: rgba(255,255,255,0.10); --grid: #2c2c2a;
+    --brass: #d4b356; --brass-soft: rgba(212,179,86,0.14);
+    --zone-fill: rgba(212,179,86,0.08); --zone-stroke: rgba(212,179,86,0.32);
+    --c-saas: #3987e5; --c-market: #1baf7a; --c-rente: #c98500;
+    --c-gestion: #9085e9; --c-pub: #d55181; --c-ip: #4db8b0; --c-lourd: #8fa3ab;
+  }
+  :root[data-theme="light"] {
+    --paper: #f9f9f7; --surface: #fcfcfb;
+    --ink: #0b0b0b; --ink-2: #52514e; --ink-3: #8a8880;
+    --hairline: rgba(11,11,11,0.10); --grid: #e1e0d9;
+    --brass: #8a6d1f; --brass-soft: rgba(138,109,31,0.12);
+    --zone-fill: rgba(138,109,31,0.07); --zone-stroke: rgba(138,109,31,0.35);
+    --c-saas: #2a78d6; --c-market: #199e70; --c-rente: #c98500;
+    --c-gestion: #4a3aa7; --c-pub: #d55181; --c-ip: #2f8f8a; --c-lourd: #5b6b73;
+  }
+
+  html, body { background: var(--paper); color: var(--ink); }
+  * { box-sizing: border-box; }
+  body {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    line-height: 1.5;
+    padding: 28px clamp(16px, 4vw, 48px) 52px;
+    max-width: 1180px;
+    margin: 0 auto;
+  }
+  .eyebrow {
+    font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--brass); font-weight: 600;
+  }
+  h1 {
+    font-family: Charter, "Bitstream Charter", "Sitka Text", Cambria, Georgia, serif;
+    font-size: clamp(26px, 3.2vw, 36px);
+    font-weight: 700; line-height: 1.14; text-wrap: balance;
+    margin: 6px 0 12px;
+  }
+  h2 {
+    font-family: Charter, "Bitstream Charter", "Sitka Text", Cambria, Georgia, serif;
+    font-size: 21px; font-weight: 700; margin: 0 0 4px;
+  }
+  .sub { color: var(--ink-2); max-width: 72ch; margin: 0 0 8px; font-size: 15.5px; }
+
+  section { margin-top: 40px; }
+  section > .kicker {
+    font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--ink-3); font-weight: 600; margin-bottom: 6px;
+  }
+
+  .map-wrap {
+    overflow-x: auto; border: 1px solid var(--hairline); border-radius: 12px;
+    background: var(--surface); margin-top: 16px;
+  }
+  svg#map { display: block; min-width: 820px; width: 100%; height: auto; }
+  .axis-label { font-size: 12px; fill: var(--ink-3); }
+  .axis-label.title { font-size: 12.5px; font-weight: 650; letter-spacing: 0.04em; fill: var(--ink-2); }
+  .zone-label { font-size: 12.5px; fill: var(--brass); font-weight: 650; }
+  .zone-label.sub { font-size: 11.5px; fill: var(--ink-3); font-weight: 500; }
+  .pt-label { font-size: 12px; fill: var(--ink); }
+
+  #tooltip {
+    position: fixed; pointer-events: none; z-index: 10;
+    background: #232320; color: #fff; font-size: 12.5px; line-height: 1.4;
+    padding: 7px 10px; border-radius: 7px; max-width: 250px;
+    opacity: 0; transition: opacity 0.12s;
+  }
+  #tooltip.on { opacity: 1; }
+
+  .legend {
+    display: flex; flex-wrap: wrap; gap: 7px 16px; margin-top: 14px; font-size: 12.5px; color: var(--ink-2);
+  }
+  .legend .chip { display: inline-flex; align-items: center; gap: 6px; }
+  .legend .swatch { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--hairline); border-radius: 12px;
+    padding: 18px 20px; max-width: 74ch;
+  }
+  .card ul { margin: 8px 0 0; padding-left: 18px; }
+  .card li { margin: 6px 0; font-size: 14.5px; color: var(--ink-2); }
+  .card li strong { color: var(--ink); }
+
+  .note {
+    margin-top: 26px; font-size: 12.5px; color: var(--ink-3); max-width: 84ch;
+    border-top: 1px solid var(--hairline); padding-top: 12px;
+  }
+</style>
+
+<p class="eyebrow">La Grande Machine · Prototype</p>
+<h1>La carte des modèles d'entreprise — où l'argent revient tout seul</h1>
+<p class="sub">Même logique que « rivières &amp; lacs », appliquée cette fois aux <strong>entreprises</strong> plutôt
+qu'aux marchés : on les classe selon <strong>ce qu'elles doivent immobiliser pour tourner</strong> (capital) et
+<strong>si le revenu se répète tout seul ou s'il faut le regagner à chaque fois</strong> (récurrence). Le coin en
+haut à gauche — léger et récurrent — est le plus facile à atteindre sans gros capital de départ ; le coin en
+haut à droite est aussi une rente, mais elle se paie par un bilan lourd.</p>
+
+<section>
+  <p class="kicker">La carte</p>
+  <h2>Intensité capitalistique × récurrence du revenu</h2>
+  <p class="sub">Survolez un point pour le détail.</p>
+
+  <div class="map-wrap">
+    <svg id="map" viewBox="0 0 1100 640" role="img"
+         aria-label="Carte des modèles d'entreprise selon l'intensité capitalistique et la récurrence du revenu"></svg>
+  </div>
+
+  <div class="legend" id="legend"></div>
+</section>
+
+<section>
+  <p class="kicker">La grille de lecture</p>
+  <h2>Ce qui rend un modèle reproductible à petite échelle</h2>
+  <div class="card">
+    <strong>Cinq critères, dans l'ordre où ils éliminent des options</strong>
+    <ul>
+      <li><strong>Capital de départ faible</strong> — le modèle démarre sur du travail et de l'expertise, pas
+      sur un bilan (pas de tour de table, pas de foncière).</li>
+      <li><strong>Coût marginal proche de zéro</strong> — servir un client de plus ne coûte quasiment rien
+      (logiciel, contenu, données) plutôt qu'un stock ou une usine de plus.</li>
+      <li><strong>Le revenu se répète sans être reconquis</strong> — abonnement, frais sur encours, redevance —
+      pas un projet qu'il faut re-vendre à zéro chaque fois.</li>
+      <li><strong>Scalable sans embaucher au même rythme</strong> — un système (logiciel, pipeline) fait le
+      travail répétitif, pas des personnes en plus.</li>
+      <li><strong>S'appuie sur une compétence déjà démontrée</strong> — pas une compétence à acquérir en plus
+      du reste.</li>
+    </ul>
+  </div>
+</section>
+
+<p class="note">Chiffres de positionnement sur la carte : <strong>ordres de grandeur illustratifs</strong>, pour
+situer des familles les unes par rapport aux autres — pas une notation d'entreprises précises. Outil pédagogique,
+pas un conseil d'investissement.</p>
+
+<div id="tooltip"></div>
+
+<script>
+(function () {
+  "use strict";
+  const NS = "http://www.w3.org/2000/svg";
+  const svg = document.getElementById("map");
+
+  const PAD = { l: 60, r: 40, t: 40, b: 56 };
+  const W = 1100, H = 640;
+  const plotW = W - PAD.l - PAD.r, plotH = H - PAD.t - PAD.b;
+  const X = v => PAD.l + (v / 100) * plotW;
+  const Y = v => PAD.t + plotH - (v / 100) * plotH;
+
+  const FAMILIES = {
+    saas:    { label: "Abonnement logiciel / contenu", color: "c-saas" },
+    market:  { label: "Place de marché (take-rate)",   color: "c-market" },
+    rente:   { label: "Rente d'infrastructure lourde", color: "c-rente" },
+    gestion: { label: "Gestion d'actifs / assurance (float)", color: "c-gestion" },
+    pub:     { label: "Audience / publicité",          color: "c-pub" },
+    ip:      { label: "Licence / propriété intellectuelle", color: "c-ip" },
+    lourd:   { label: "Industrie capitalistique cyclique", color: "c-lourd" },
+  };
+
+  const POINTS = [
+    { x: 15, y: 90, fam: "saas", name: "Éditeurs SaaS", sub: "ex. Adobe, Notion — coût marginal ≈ 0" },
+    { x: 10, y: 76, fam: "ip", name: "Catalogues / licences", sub: "ex. maisons de disques, franchises de personnages" },
+    { x: 30, y: 68, fam: "market", name: "Rails de paiement", sub: "ex. Visa, Mastercard — % sur transaction" },
+    { x: 38, y: 60, fam: "market", name: "Places de marché", sub: "ex. Airbnb, plateformes à commission" },
+    { x: 24, y: 62, fam: "gestion", name: "Gérants d'actifs", sub: "frais sur encours — le capital n'est pas le leur" },
+    { x: 22, y: 40, fam: "pub", name: "Plateformes publicitaires", sub: "produit gratuit, revenu sur l'audience" },
+
+    { x: 85, y: 88, fam: "rente", name: "Concessions d'infrastructure", sub: "ex. autoroutes, aéroports" },
+    { x: 78, y: 74, fam: "rente", name: "Réseaux / télécoms", sub: "capex énorme, abonnement ensuite" },
+    { x: 70, y: 70, fam: "gestion", name: "Assurance (float)", sub: "prime encaissée avant le sinistre" },
+    { x: 74, y: 58, fam: "lourd", name: "Foncières / immobilier locatif", sub: "loyers récurrents, capital immobilisé" },
+    { x: 66, y: 55, fam: "gestion", name: "Banques (marge d'intérêt)", sub: "bilan lourd, marge sur l'écart de taux" },
+
+    { x: 16, y: 18, fam: "saas", name: "Conseil / agences", sub: "facturé au projet — à regagner à chaque fois" },
+    { x: 24, y: 12, fam: "market", name: "Revente / arbitrage", sub: "e-commerce sans marque propre" },
+
+    { x: 84, y: 22, fam: "lourd", name: "Extraction, chantier naval", sub: "capex lourd, vente à l'unité" },
+    { x: 76, y: 30, fam: "lourd", name: "Constructeurs (auto, etc.)", sub: "usines lourdes, cycles de vente" },
+    { x: 80, y: 40, fam: "lourd", name: "Compagnies aériennes", sub: "capex lourd, marges fragiles et cycliques" },
+  ];
+
+  function el(name, attrs, parent) {
+    const e = document.createElementNS(NS, name);
+    for (const k in attrs) e.setAttribute(k, attrs[k]);
+    if (parent) parent.appendChild(e);
+    return e;
+  }
+
+  // grid
+  const gGrid = el("g", {}, svg);
+  for (let v = 0; v <= 100; v += 20) {
+    el("line", { x1: X(v), y1: PAD.t, x2: X(v), y2: PAD.t + plotH, stroke: "var(--grid)", "stroke-width": 1 }, gGrid);
+    el("line", { x1: PAD.l, y1: Y(v), x2: PAD.l + plotW, y2: Y(v), stroke: "var(--grid)", "stroke-width": 1 }, gGrid);
+  }
+  // axes
+  el("line", { x1: PAD.l, y1: PAD.t, x2: PAD.l, y2: PAD.t + plotH, stroke: "var(--hairline)", "stroke-width": 1.4 }, gGrid);
+  el("line", { x1: PAD.l, y1: PAD.t + plotH, x2: PAD.l + plotW, y2: PAD.t + plotH, stroke: "var(--hairline)", "stroke-width": 1.4 }, gGrid);
+
+  const t1 = el("text", { x: PAD.l, y: 22, class: "axis-label title" }, gGrid);
+  t1.textContent = "↑ le revenu se répète tout seul (rente, abonnement, frais récurrents)";
+  const t2 = el("text", { x: PAD.l, y: H - 14, class: "axis-label title" }, gGrid);
+  t2.textContent = "intensité capitalistique →   (léger : pas de bilan à financer  —  lourd : capex massif requis)";
+  const t3 = el("text", { x: PAD.l, y: PAD.t + plotH - 6, class: "axis-label" }, gGrid);
+  t3.textContent = "chaque vente est à regagner (projet, cycle, unité)";
+
+  // target zone highlight (top-left)
+  const zone = el("rect", {
+    x: PAD.l, y: PAD.t, width: plotW * 0.42, height: plotH * 0.42,
+    fill: "var(--zone-fill)", stroke: "var(--zone-stroke)", "stroke-width": 1.2, "stroke-dasharray": "5 4", rx: 6,
+  }, gGrid);
+  const zl = el("text", { x: PAD.l + 12, y: PAD.t + 22, class: "zone-label" }, gGrid);
+  zl.textContent = "Léger + récurrent";
+  const zl2 = el("text", { x: PAD.l + 12, y: PAD.t + 38, class: "zone-label sub" }, gGrid);
+  zl2.textContent = "pas de capital de départ requis";
+
+  // points
+  const gPts = el("g", {}, svg);
+  const tip = document.getElementById("tooltip");
+  function showTip(ev, html) {
+    tip.innerHTML = html;
+    tip.classList.add("on");
+    const pad = 14;
+    let x = ev.clientX + pad, y = ev.clientY + pad;
+    const r = tip.getBoundingClientRect();
+    if (x + r.width > window.innerWidth - 8) x = ev.clientX - r.width - pad;
+    if (y + r.height > window.innerHeight - 8) y = ev.clientY - r.height - pad;
+    tip.style.left = x + "px"; tip.style.top = y + "px";
+  }
+  function hideTip() { tip.classList.remove("on"); }
+
+  POINTS.forEach(p => {
+    const col = `var(--${FAMILIES[p.fam].color})`;
+    const c = el("circle", { cx: X(p.x), cy: Y(p.y), r: 7, fill: col, opacity: 0.85, stroke: "var(--surface)", "stroke-width": 1.6 }, gPts);
+    c.style.cursor = "help";
+    c.addEventListener("pointermove", ev => showTip(ev, `<strong>${p.name}</strong><br>${p.sub}<br><span style="opacity:.7">${FAMILIES[p.fam].label}</span>`));
+    c.addEventListener("pointerleave", hideTip);
+    const anchor = p.x > 80 ? "end" : "start";
+    const dx = p.x > 80 ? -11 : 11;
+    const lbl = el("text", { x: X(p.x) + dx, y: Y(p.y) + 4, class: "pt-label", "text-anchor": anchor }, gPts);
+    lbl.textContent = p.name;
+  });
+
+  // legend
+  document.getElementById("legend").innerHTML = Object.values(FAMILIES).map(f =>
+    `<span class="chip"><span class="swatch" style="background:var(--${f.color})"></span>${f.label}</span>`
+  ).join("");
+})();
+</script>
