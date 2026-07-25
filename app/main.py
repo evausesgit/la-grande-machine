@@ -320,9 +320,7 @@ def api_collecte_fonds(deep: bool = False, session: Session = Depends(get_sessio
     return {"ok": ok, "echecs": len(report) - ok, "detail": report}
 
 
-@app.post("/api/brief", dependencies=[Depends(require_token)])
-def api_brief_publier(payload: dict, session: Session = Depends(get_session)):
-    """Publication du brief du matin (utilisé par la routine rédactrice — phase 2)."""
+def publier_brief(session: Session, payload: dict) -> dict:
     try:
         day = datetime.date.fromisoformat(payload["date"])
         title, body = payload["titre"], payload["corps_md"]
@@ -336,6 +334,24 @@ def api_brief_publier(payload: dict, session: Session = Depends(get_session)):
         brief.title, brief.body_md, brief.payload = title, body, payload.get("donnees", {})
     session.commit()
     return {"publie": day.isoformat()}
+
+
+@app.post("/api/brief", dependencies=[Depends(require_token)])
+def api_brief_publier(payload: dict, session: Session = Depends(get_session)):
+    """Publication directe du brief (payload déjà rédigé)."""
+    return publier_brief(session, payload)
+
+
+@app.post("/api/brief/generer", dependencies=[Depends(require_token)])
+def api_brief_generer(session: Session = Depends(get_session)):
+    """Déclenche la rédaction + publication du brief du jour, dans le container
+    (recherche web incluse). Utilisé par le scheduler quotidien, et disponible
+    en manuel pour tester ou rattraper une journée manquée."""
+    from .brief_writer import generer_et_publier
+    try:
+        return generer_et_publier(session)
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"échec de la rédaction : {exc}")
 
 
 @app.get("/api/brief/dernier")

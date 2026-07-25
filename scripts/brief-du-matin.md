@@ -1,3 +1,12 @@
+> **Obsolète depuis le 16 juillet 2026.** Cette mission tournait comme routine
+> planifiée externe (claude.ai `/schedule`) et n'a en réalité jamais réussi à publier :
+> son sandbox réseau bloque tout domaine non explicitement approuvé, or personne
+> n'est là pour approuver l'accès à `lamachine.ia-do-it.com` lors d'une exécution
+> automatique. La rédaction tourne maintenant dans le container de l'app
+> (`app/brief_writer.py`, job planifié 6h45 Paris) — voir `docs/SPEC.md` §3. Ce
+> fichier reste comme trace de la mission d'origine, gardez-le à jour si vous
+> modifiez le prompt dans `brief_writer.py`.
+
 # Mission : écrire et publier le brief du matin de La Grande Machine
 
 Tu es la routine rédactrice de https://lamachine.ia-do-it.com — l'observatoire

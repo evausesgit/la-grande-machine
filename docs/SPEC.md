@@ -61,14 +61,22 @@ Chaque mouvement est expliqué par trois couches croisées :
 
 ### Qui écrit le brief ?
 
-Une **routine planifiée Claude** (agent programmé, `/schedule`) tourne chaque matin
-vers 6h45 Europe/Paris :
-1. lit `GET /api/journee` (les mouvements calculés par l'app, z-scores, chaînes candidates) ;
-2. fait la recherche d'actualités ;
-3. rédige le brief en français et le publie via `POST /api/brief` (jeton secret en variable d'env, jamais dans le repo).
+**Un job planifié dans le container de l'app** (`app/scheduler.py`, 6h45 Europe/Paris,
+`app/brief_writer.py`) :
+1. calcule les mouvements du jour en interne (même fonction que `GET /api/journee`) ;
+2. appelle l'API Claude (`ANTHROPIC_API_KEY`, outil `web_search` intégré) pour la
+   recherche d'actualités et la rédaction ;
+3. publie directement en base via la même logique que `POST /api/brief`.
 
-Avantage : zéro coût d'API supplémentaire, et le rédacteur (moi) connaît la carte.
-Solution de repli documentée : appel direct de l'API Claude depuis l'app.
+Historique : la v1 de ce chantier utilisait une routine planifiée externe (claude.ai
+`/schedule`, hors du container). Abandonnée le 16 juillet 2026 : son sandbox réseau
+n'autorise que des domaines explicitement approuvés, et personne n'est présent pour
+approuver l'accès à `lamachine.ia-do-it.com` lors d'une exécution automatique — chaque
+appel (lecture des données comme publication) échouait silencieusement. Le container
+de l'app a un accès réseau sortant qui fonctionne déjà (Yahoo, FRED, EDGAR), d'où le
+déplacement de toute la chaîne à l'intérieur. `POST /api/brief/generer` (jeton admin)
+permet de déclencher la rédaction à la demande, pour tester ou rattraper une journée
+manquée.
 
 ## 4. Le brief du matin (format)
 
